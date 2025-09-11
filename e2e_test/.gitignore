@@ -1,0 +1,97 @@
+# Ignorar archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Ignorar archivos de testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Ignorar reportes de tests
+e2e_test/reports/
+*.html
+*.xml
+*.json
+*.log
+
+# Ignorar screenshots
+screenshots/
+*.png
+*.jpg
+*.jpeg
+
+# Ignorar archivos de Selenium
+geckodriver.log
+chromedriver.log
+*.tmp
+
+# Ignorar archivos de configuración local
+local_settings.py
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Ignorar archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos de base de datos
+*.db
+*.sqlite3
+
+# Ignorar archivos de logs
+*.log
+logs/
+
+# Ignorar archivos de backup
+*.bak
+*.backup
+
+# Ignorar archivos temporales
+*.tmp
+*.temp
+
+# Ignorar archivos de Allure
+allure-results/
+allure-report/
+
+# Ignorar archivos de performance
+*.prof
+*.memory

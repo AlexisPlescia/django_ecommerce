@@ -4,6 +4,7 @@ from store.models import Product
 from django.http import JsonResponse
 from django.contrib import messages
 
+
 def cart_summary(request):
 	# Get the cart
 	cart = Cart(request)
@@ -67,3 +68,11 @@ def cart_update(request):
 		messages.success(request, ("Your Cart Has Been Updated..."))
 		return response
 
+#def pago_exitoso(request):
+   # return HttpResponse("¡Pago exitoso! Gracias por tu compra.")
+
+#def pago_fallido(request):
+    #return HttpResponse("El pago falló. Por favor, intentá nuevamente.")
+
+#def pago_pendiente(request):
+    #return HttpResponse("Tu pago está pendiente.")

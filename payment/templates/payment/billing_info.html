@@ -4,11 +4,12 @@
 {% block content %}
 
         <!-- Header-->
-        <header class="bg-dark py-5">
-            <div class="container px-4 px-lg-5 my-5">
+        <header class="py-5" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); min-height: 400px; position: relative;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0); background-size: 20px 20px; z-index: 1;"></div>
+            <div class="container px-4 px-lg-5 my-5" style="position: relative; z-index: 2;">
                 <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder">Billing Info</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">Enter Your Payment Info...</p>
+                <h1 class="display-4 fw-bolder" style="color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Información de Facturación</h1>
+                <p class="lead fw-normal mb-0" style="color: #e0e0e0 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Ingrese su información de pago...</p>
                 </div>
             </div>
         </header>
@@ -19,7 +20,7 @@
                     <div class="col-md-6 offset-md-3">
           <div class="card">
           <div class="card-header">
-            Order Summary
+            Resumen del Pedido
           </div>
           <div class="card-body">
             {% for product in cart_products %}
@@ -31,7 +32,7 @@
                 {% endif %}
 
                 <br/>
-                <small>Quantity: 
+                <small>Cantidad: 
                 {% for key, value in quantities.items %}
                     {% if key == product.id|slugify %}
                         {{ value }}
@@ -42,41 +43,33 @@
             {% endfor %}
             Total:  ${{ totals }}
             <br/><br/>
-            <a href="{% url 'cart_summary' %}" class="btn btn-sm btn-outline-secondary">Update Items</a>
+            <a href="{% url 'cart_summary' %}" class="btn btn-sm btn-outline-secondary">Actualizar artículos</a>
           </div>
         </div>
 <br/><br/>
 <div class="card">
   <div class="card-header">
-    Shipping Info
+    Información de Envío
   </div>
   <div class="card-body">
     
-    Name: {{ shipping_info.shipping_full_name }}<br/>
-    Email: {{ shipping_info.shipping_email }}<br/>
-    Address 1: {{ shipping_info.shipping_address1 }}<br/>
-    Address 2: {{ shipping_info.shipping_address2 }}<br/>
-    City: {{ shipping_info.shipping_city }}<br/>
-    State: {{ shipping_info.shipping_state }}<br/>
-    Zipcode: {{ shipping_info.shipping_zipcode }}<br/>
-    Country: {{ shipping_info.shipping_country }}<br/>
+    Nombre: {{ shipping_info.shipping_full_name }}<br/>
+    Correo electrónico: {{ shipping_info.shipping_email }}<br/>
+    Dirección: {{ shipping_info.shipping_address1 }}<br/>
+    Ciudad: {{ shipping_info.shipping_city }}<br/>
+    Provincia/Estado: {{ shipping_info.shipping_state }}<br/>
+    Código postal: {{ shipping_info.shipping_zipcode }}<br/>
     <br/>
-    <a href="{% url 'checkout' %}" class="btn btn-outline-secondary">Update Shipping</a>
+    <a href="{% url 'checkout' %}" class="btn btn-outline-secondary">Actualizar Envío</a>
 
   </div>
 </div>
 <br/><br/>
 
-<center>
-    {{ paypal_form.render }}
-</center>
-
-<br/><br/>
-
 
 <div class="card">
   <div class="card-header">
-    Billing Info
+    Información de Facturación
   </div>
   <div class="card-body">
     <form method="POST" action="{% url 'process_order' %}">
@@ -90,7 +83,7 @@
 
 
 <button type="submit" class="btn btn-secondary">
-  Pay Now
+  Pagar Ahora
 </button>
 </form>
 <br/><br/>

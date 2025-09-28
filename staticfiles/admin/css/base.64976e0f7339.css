@@ -6,7 +6,7 @@
 html[data-theme="light"],
 :root {
     --primary: #79aec8;
-    --secondary: #417690;
+    --secondary: #d63205;
     --accent: #f5dd5d;
     --primary-fg: #fff;
 
@@ -17,7 +17,7 @@ html[data-theme="light"],
 
     --header-color: #ffc;
     --header-branding-color: var(--accent);
-    --header-bg: var(--secondary);
+    --header-bg: #d63205;
     --header-link-color: var(--primary-fg);
 
     --breadcrumbs-fg: #c4dce8;

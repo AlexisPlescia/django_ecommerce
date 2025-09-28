@@ -4,11 +4,12 @@
 {% block content %}
 
         <!-- Header-->
-        <header class="bg-dark py-5">
-            <div class="container px-4 px-lg-5 my-5">
+        <header class="py-5" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); min-height: 400px; position: relative;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0); background-size: 20px 20px; z-index: 1;"></div>
+            <div class="container px-4 px-lg-5 my-5" style="position: relative; z-index: 2;">
                 <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder">Shopping Cart</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">View Your Cart...</p>
+                    <h1 class="display-4 fw-bolder" style="color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Shopping Cart</h1>
+                    <p class="lead fw-normal mb-0" style="color: #e0e0e0 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">View Your Cart...</p>
                 </div>
             </div>
         </header>
@@ -32,7 +33,7 @@
         {% if product.is_sale %}
         <div class="d-flex justify-content-center small text-warning mb-2">
                 <div class="bi-star-fill"></div>
-                &nbsp;&nbsp;Sale!&nbsp;&nbsp;
+                &nbsp;&nbsp;¡Oferta!&nbsp;&nbsp;
                 <div class="bi-star-fill"></div>
                 </div>
 
@@ -71,9 +72,9 @@
                 </div>
             </div>
             <br/><br/>
-        <a href="{% url 'home'%}" class="btn btn-secondary">Home</a>
-        <button type="button" data-index="{{product.id}}" class="btn btn-secondary update-cart">Update</button>
-        <button type="button" data-index="{{product.id}}" class="btn btn-danger delete-product">Remove</button>
+        <a href="{% url 'home'%}" class="btn btn-secondary">Inicio</a>
+        <button type="button" data-index="{{product.id}}" class="btn btn-secondary update-cart">Actualizar</button>
+        <button type="button" data-index="{{product.id}}" class="btn btn-danger delete-product">Eliminar</button>
         
     </center>
       </div>
@@ -86,12 +87,12 @@
         	{% endfor %}
             <div align="right">
             <h3>Total: ${{ totals }}</h3>
-            <a href="{% url 'checkout' %}" class="btn btn-success">Checkout</a>
+            <a href="{% url 'checkout' %}" class="btn btn-success">Finalizar Compra</a>
 
             </div>
             <br/><br/><br/>
         	{% else %}
-        	There's Nothing In Your Cart...
+        	Tu carrito está vacío...
         	<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
         {% endif %}
     	</div>

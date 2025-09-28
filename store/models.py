@@ -85,6 +85,7 @@ class Order(models.Model):
 	phone = models.CharField(max_length=20, default='', blank=True)
 	date = models.DateField(default=datetime.datetime.today)
 	status = models.BooleanField(default=False)
+	payment_id = models.CharField(max_length=100, blank=True, null=True, help_text="ID de pago de Mercado Pago")
 
 	def __str__(self):
 		return self.product

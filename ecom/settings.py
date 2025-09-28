@@ -1,13 +1,14 @@
 from pathlib import Path
+
 import os
 
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load our environmental variables
-# load_dotenv()
+load_dotenv()
 
 
 
@@ -24,7 +25,7 @@ SECRET_KEY = 'django-insecure-x4m$gfeda-r+)u05g*bzm%8#_vz&8-wl^3epo45gqi#_eqwvtq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://djangotest.com', 'djangotest.com', 'django-ecommerce-production-81b6.up.railway.app', 'https://django-ecommerce-production-81b6.up.railway.app']
+ALLOWED_HOSTS = ['https://djangotest.com','127.0.0.1', 'localhost','djangotest.com', 'django-ecommerce-production-81b6.up.railway.app', 'https://django-ecommerce-production-81b6.up.railway.app ']
 CSRF_TRUSTED_ORIGINS = ['https://djangotest.com', 'https://django-ecommerce-production-81b6.up.railway.app']
 
 # Application definition
@@ -82,15 +83,8 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 
 DATABASES = {
     'default': {
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': BASE_DIR / 'db.sqlite3',
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': DB_PASSWORD_YO,
-        'HOST': 'viaduct.proxy.rlwy.net',
-        'PORT': '23278',
-        
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",  # Asegúrate de que está bien configurado
     }
 }
 
@@ -149,6 +143,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Add paypal settings
 # Set sandbox to true
-PAYPAL_TEST = True
+# Comentado 19/4 PAYPAL_TEST = True
 
-PAYPAL_RECEIVER_EMAIL = 'business@codemytest.com' # Business Sandbox account
+# Comentado 19/4 PAYPAL_RECEIVER_EMAIL = 'business@codemytest.com' # Business Sandbox account
+
+# Configura tu access token de Mercado Pago en settings.py
+MERCADOPAGO_ACCESS_TOKEN = 'APP_USR-1489230634829663-042812-15c53ea0d2ffc1450a7beabf54adadaf-1269042177'
+MERCADOPAGO_PUBLIC_KEY = 'APP_USR-2d14c31c-e478-4ef1-b5f9-4468c4e8c645'
+
+# Configuración de email para envío automático
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.tu-proveedor.com'  # Cambia esto por tu servidor SMTP
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'tu-email@tudominio.com'  # Cambia esto por tu email
+EMAIL_HOST_PASSWORD = 'tu-contraseña'       # Cambia esto por tu contraseña
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

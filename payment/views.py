@@ -6,11 +6,12 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from store.models import Product, Profile
 import datetime
+import mercadopago
+from django.conf import settings
 
 # Import Some Paypal Stuff
 from django.urls import reverse
 from paypal.standard.forms import PayPalPaymentsForm
-from django.conf import settings
 import uuid # unique user id for duplictate orders
 
 def orders(request, pk):
@@ -109,7 +110,7 @@ def process_order(request):
 		full_name = my_shipping['shipping_full_name']
 		email = my_shipping['shipping_email']
 		# Create Shipping Address from session info
-		shipping_address = f"{my_shipping['shipping_address1']}\n{my_shipping['shipping_address2']}\n{my_shipping['shipping_city']}\n{my_shipping['shipping_state']}\n{my_shipping['shipping_zipcode']}\n{my_shipping['shipping_country']}"
+		shipping_address = f"{my_shipping['shipping_address1']}\n{my_shipping['shipping_city']}\n{my_shipping['shipping_state']}\n{my_shipping['shipping_zipcode']}"
 		amount_paid = totals
 
 		# Create an Order
@@ -204,56 +205,42 @@ def process_order(request):
 		return redirect('home')
 
 def billing_info(request):
-	if request.POST:
-		# Get the cart
-		cart = Cart(request)
-		cart_products = cart.get_prods
-		quantities = cart.get_quants
-		totals = cart.cart_total()
+    if request.POST:
+        cart = Cart(request)
+        cart_products = cart.get_prods
+        quantities = cart.get_quants
+        totals = cart.cart_total()
+        my_shipping = request.POST
+        request.session['my_shipping'] = my_shipping
 
-		# Create a session with Shipping Info
-		my_shipping = request.POST
-		request.session['my_shipping'] = my_shipping
-
-		# Get the host
-		host = request.get_host()
-		# Create Paypal Form Dictionary
-		paypal_dict = {
-			'business': settings.PAYPAL_RECEIVER_EMAIL,
-			'amount': totals,
-			'item_name': 'Book Order',
-			'no_shipping': '2',
-			'invoice': str(uuid.uuid4()),
-			'currency_code': 'USD', # EUR for Euros
-			'notify_url': 'https://{}{}'.format(host, reverse("paypal-ipn")),
-			'return_url': 'https://{}{}'.format(host, reverse("payment_success")),
-			'cancel_return': 'https://{}{}'.format(host, reverse("payment_failed")),
-		}
-
-		# Create acutal paypal button
-		paypal_form = PayPalPaymentsForm(initial=paypal_dict)
-
-
-		# Check to see if user is logged in
-		if request.user.is_authenticated:
-			# Get The Billing Form
-			billing_form = PaymentForm()
-			return render(request, "payment/billing_info.html", {"paypal_form":paypal_form, "cart_products":cart_products, "quantities":quantities, "totals":totals, "shipping_info":request.POST, "billing_form":billing_form})
-
-		else:
-			# Not logged in
-			# Get The Billing Form
-			billing_form = PaymentForm()
-			return render(request, "payment/billing_info.html", {"paypal_form":paypal_form, "cart_products":cart_products, "quantities":quantities, "totals":totals, "shipping_info":request.POST, "billing_form":billing_form})
-
-
-		
-		shipping_form = request.POST
-		return render(request, "payment/billing_info.html", {"cart_products":cart_products, "quantities":quantities, "totals":totals, "shipping_form":shipping_form})	
-	else:
-		messages.success(request, "Access Denied")
-		return redirect('home')
-
+        # Mercado Pago SDK
+        sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+        preference_data = {
+            "items": [
+                {
+                    "title": "Compra en Ecommerce",
+                    "quantity": 1,
+                    "unit_price": float(totals),
+                }
+            ],
+            "payer": {
+                "email": my_shipping.get('shipping_email', '')
+            }
+        }
+        preference_response = sdk.preference().create(preference_data)
+        # Validar respuesta de Mercado Pago
+        if "response" in preference_response and "init_point" in preference_response["response"]:
+            init_point = preference_response["response"]["init_point"]
+            # Redirigir al usuario a la pasarela de Mercado Pago
+            return redirect(init_point)
+        else:
+            # Mostrar error claro
+            error_msg = preference_response.get("message", "Error al crear la preferencia de Mercado Pago. Intente nuevamente.")
+            messages.error(request, f"Mercado Pago error: {error_msg}")
+            return redirect('checkout')
+    else:
+        messages.error(request, "Acceso denegado")
+        return redirect('home')
 
 def checkout(request):
 	# Get the cart

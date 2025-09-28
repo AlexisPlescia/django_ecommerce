@@ -194,6 +194,7 @@ def register_user(request):
 def pagar_producto(request, pk):
     product = Product.objects.get(id=pk)
     sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+    # Si el precio es 0, no permitir pagar
     precio = float(product.sale_price if product.is_sale else product.price)
     if precio <= 0:
         from django.contrib import messages

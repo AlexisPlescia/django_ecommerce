@@ -148,8 +148,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Comentado 19/4 PAYPAL_RECEIVER_EMAIL = 'business@codemytest.com' # Business Sandbox account
 
 # Configura tu access token de Mercado Pago en settings.py
-MERCADOPAGO_ACCESS_TOKEN = 'APP_USR-1489230634829663-042812-15c53ea0d2ffc1450a7beabf54adadaf-1269042177'
-MERCADOPAGO_PUBLIC_KEY = 'APP_USR-2d14c31c-e478-4ef1-b5f9-4468c4e8c645'
+MERCADOPAGO_ACCESS_TOKEN = 'accestoken'
+MERCADOPAGO_PUBLIC_KEY = 'publickey'
 
 # Configuración de email para envío automático
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -158,4 +158,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'tu-email@tudominio.com'  # Cambia esto por tu email
 EMAIL_HOST_PASSWORD = 'tu-contraseña'       # Cambia esto por tu contraseña
+
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

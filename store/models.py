@@ -38,13 +38,59 @@ post_save.connect(create_profile, sender=User)
 # Categories of Products
 class Category(models.Model):
 	name = models.CharField(max_length=50)
+	parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories')
+	description = models.TextField(blank=True, null=True)
+	is_active = models.BooleanField(default=True)
 
 	def __str__(self):
+		if self.parent:
+			return f"{self.parent.name} > {self.name}"
 		return self.name
 
-	#@daverobb2011
+	def get_all_products(self):
+		"""Obtiene todos los productos de esta categoría y sus subcategorías"""
+		from django.db.models import Q
+		if self.subcategories.exists():
+			# Si tiene subcategorías, incluir productos de todas las subcategorías
+			subcategory_ids = [sub.id for sub in self.subcategories.all()]
+			return Product.objects.filter(Q(category=self) | Q(category__id__in=subcategory_ids))
+		else:
+			# Si no tiene subcategorías, solo productos de esta categoría
+			return Product.objects.filter(category=self)
+
+	@property
+	def is_parent(self):
+		return self.parent is None
+
+	@property
+	def is_subcategory(self):
+		return self.parent is not None
+
 	class Meta:
 		verbose_name_plural = 'categories'
+
+
+# Modelo para imágenes adicionales del producto
+class ProductImage(models.Model):
+	product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='additional_images')
+	image = models.ImageField(upload_to='uploads/product/gallery/')
+	alt_text = models.CharField(max_length=200, blank=True, null=True)
+	is_primary = models.BooleanField(default=False)
+	order = models.PositiveIntegerField(default=0)
+
+	class Meta:
+		ordering = ['order', 'id']
+		verbose_name = 'Imagen del Producto'
+		verbose_name_plural = 'Imágenes del Producto'
+
+	def __str__(self):
+		return f"{self.product.name} - Imagen {self.order}"
+
+	def save(self, *args, **kwargs):
+		# Si es marcada como primaria, desmarcar las otras
+		if self.is_primary:
+			ProductImage.objects.filter(product=self.product, is_primary=True).exclude(id=self.id).update(is_primary=False)
+		super().save(*args, **kwargs)
 
 
 # Customers
@@ -64,16 +110,72 @@ class Customer(models.Model):
 # All of our Products
 class Product(models.Model):
 	name = models.CharField(max_length=100)
-	price = models.DecimalField(default=0, decimal_places=2, max_digits=6)
+	price = models.DecimalField(default=0, decimal_places=4, max_digits=10)
 	category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
 	description = models.CharField(max_length=250, default='', blank=True, null=True)
 	image = models.ImageField(upload_to='uploads/product/')
 	# Add Sale Stuff
 	is_sale = models.BooleanField(default=False)
-	sale_price = models.DecimalField(default=0, decimal_places=2, max_digits=6)
+	sale_price = models.DecimalField(default=0, decimal_places=4, max_digits=10)
+	# Add Stock Management
+	stock = models.PositiveIntegerField(default=0, help_text="Cantidad disponible en inventario")
+	is_available = models.BooleanField(default=True, help_text="Disponible para compra")
 
 	def __str__(self):
 		return self.name
+
+	@property
+	def is_in_stock(self):
+		"""Verifica si el producto tiene stock disponible"""
+		try:
+			return self.stock > 0 and self.is_available
+		except AttributeError:
+			# Si los campos no existen, asumir que está disponible
+			return True
+	
+	def reduce_stock(self, quantity):
+		"""Reduce el stock del producto y actualiza disponibilidad"""
+		if self.stock >= quantity:
+			self.stock -= quantity
+			if self.stock == 0:
+				self.is_available = False
+			self.save()
+			return True
+		return False
+
+	def get_all_images(self):
+		"""Obtiene todas las imágenes del producto (principal + adicionales)"""
+		images = []
+		# Imagen principal
+		if self.image:
+			images.append({
+				'url': self.image.url,
+				'alt_text': f"{self.name} - Imagen principal",
+				'is_primary': True
+			})
+		
+		# Imágenes adicionales
+		for img in self.additional_images.all():
+			images.append({
+				'url': img.image.url,
+				'alt_text': img.alt_text or f"{self.name} - Imagen {img.order}",
+				'is_primary': img.is_primary
+			})
+		
+		return images
+
+	def get_primary_image(self):
+		"""Obtiene la imagen principal del producto"""
+		# Buscar imagen marcada como primaria en las adicionales
+		primary_additional = self.additional_images.filter(is_primary=True).first()
+		if primary_additional:
+			return primary_additional.image.url
+		
+		# Si no hay imagen primaria adicional, usar la imagen del modelo principal
+		if self.image:
+			return self.image.url
+		
+		return None
 
 
 # Customer Orders
@@ -89,3 +191,121 @@ class Order(models.Model):
 
 	def __str__(self):
 		return self.product
+
+
+# Product Reservations
+class Reservation(models.Model):
+	RESERVATION_STATUS = [
+		('pending', 'Pendiente'),
+		('confirmed', 'Confirmada'),
+		('cancelled', 'Cancelada'),
+		('expired', 'Expirada'),
+	]
+	
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+	product = models.ForeignKey(Product, on_delete=models.CASCADE)
+	quantity = models.PositiveIntegerField(default=1)
+	
+	# Customer information (for guests or additional info)
+	customer_name = models.CharField(max_length=100)
+	customer_email = models.EmailField()
+	customer_phone = models.CharField(max_length=20, blank=True, null=True)
+	
+	# Shipping information
+	shipping_address = models.TextField()
+	
+	# Reservation details
+	total_price = models.DecimalField(max_digits=10, decimal_places=4)
+	status = models.CharField(max_length=20, choices=RESERVATION_STATUS, default='pending')
+	
+	# Timestamps
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+	expires_at = models.DateTimeField(null=True, blank=True, help_text="Fecha de expiración de la reserva")
+	
+	# Email notifications
+	customer_notified = models.BooleanField(default=False)
+	admin_notified = models.BooleanField(default=False)
+	
+	class Meta:
+		verbose_name = 'Reserva'
+		verbose_name_plural = 'Reservas'
+		ordering = ['-created_at']
+	
+	def __str__(self):
+		return f"Reserva #{self.id} - {self.product.name} ({self.quantity})"
+	
+	def confirm_reservation(self):
+		"""Confirma la reserva y actualiza el stock"""
+		if self.status == 'pending':
+			success = self.product.reduce_stock(self.quantity)
+			if success:
+				self.status = 'confirmed'
+				self.save()
+				return True
+		return False
+	
+	def cancel_reservation(self):
+		"""Cancela la reserva y restaura el stock si fue confirmada"""
+		if self.status == 'confirmed':
+			self.product.stock += self.quantity
+			if not self.product.is_available and self.product.stock > 0:
+				self.product.is_available = True
+			self.product.save()
+		
+		self.status = 'cancelled'
+		self.save()
+
+# Modelos para contador de visitas
+class VisitCounter(models.Model):
+    """Modelo para contar visitas al sitio"""
+    
+    # Información básica de la visita
+    ip_address = models.GenericIPAddressField()
+    user_agent = models.TextField(blank=True, null=True)
+    timestamp = models.DateTimeField(default=datetime.datetime.now)
+    
+    # Usuario (si está logueado)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # Información de la página visitada
+    page_url = models.URLField()
+    page_title = models.CharField(max_length=200, blank=True, null=True)
+    referrer = models.URLField(blank=True, null=True)
+    
+    # Información del dispositivo/navegador
+    is_mobile = models.BooleanField(default=False)
+    browser = models.CharField(max_length=100, blank=True, null=True)
+    operating_system = models.CharField(max_length=100, blank=True, null=True)
+    
+    # Información geográfica (opcional)
+    country = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    
+    class Meta:
+        verbose_name = 'Visita'
+        verbose_name_plural = 'Visitas'
+        ordering = ['-timestamp']
+    
+    def __str__(self):
+        user_info = f"Usuario: {self.user.username}" if self.user else f"IP: {self.ip_address}"
+        return f"{user_info} - {self.page_url} - {self.timestamp.strftime('%d/%m/%Y %H:%M')}"
+
+class VisitSummary(models.Model):
+    """Resumen diario de visitas para mejor rendimiento"""
+    
+    date = models.DateField(unique=True)
+    total_visits = models.PositiveIntegerField(default=0)
+    unique_visitors = models.PositiveIntegerField(default=0)
+    logged_users_visits = models.PositiveIntegerField(default=0)
+    anonymous_visits = models.PositiveIntegerField(default=0)
+    mobile_visits = models.PositiveIntegerField(default=0)
+    desktop_visits = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        verbose_name = 'Resumen de Visitas'
+        verbose_name_plural = 'Resúmenes de Visitas'
+        ordering = ['-date']
+    
+    def __str__(self):
+        return f"Visitas del {self.date.strftime('%d/%m/%Y')}: {self.total_visits} total"

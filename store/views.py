@@ -19,19 +19,64 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.http import JsonResponse
+from django.contrib.auth.decorators import user_passes_test
+from django.db.models import Count
+from datetime import datetime, timedelta
+from django.core.paginator import Paginator
 
 def search(request):
 	# Determine if they filled out the form
 	if request.method == "POST":
-		searched = request.POST['searched']
-		# Query The Products DB Model
-		searched = Product.objects.filter(Q(name__icontains=searched) | Q(description__icontains=searched))
-		# Test for null
-		if not searched:
-			messages.success(request, "That Product Does Not Exist...Please try Again.")
-			return render(request, "search.html", {})
+		search_term = request.POST.get('searched', '').strip()
+		
+		if search_term:
+			# Query The Products DB Model - buscar en nombre, descripción y categoría
+			# Hacer la búsqueda más flexible
+			search_words = search_term.lower().split()
+			
+			query = Q()
+			for word in search_words:
+				query |= (
+					Q(name__icontains=word) | 
+					Q(description__icontains=word) |
+					Q(category__name__icontains=word)
+				)
+			
+			searched_products = Product.objects.filter(query).distinct()
+			
+			# Si no encuentra nada, buscar términos relacionados
+			if not searched_products.exists():
+				related_terms = {
+					'arma': ['arma', 'rifle', 'pistola'],
+					'municion': ['municion', 'bala', 'cartucho'],
+					'accesorio': ['accesorio', 'mira', 'scope'],
+					'mantenimiento': ['mantenimiento', 'limpieza', 'aceite']
+				}
+				
+				for term, synonyms in related_terms.items():
+					if any(word in search_term.lower() for word in synonyms):
+						searched_products = Product.objects.filter(
+							Q(category__name__icontains=term)
+						).distinct()
+						if searched_products.exists():
+							break
+			
+			# Debug: contar productos
+			print(f"Búsqueda: '{search_term}', Productos encontrados: {searched_products.count()}")
+			
+			# Test for null
+			if not searched_products.exists():
+				messages.error(request, f"No se encontraron productos para '{search_term}'. Intenta con: 'arma', 'municion', 'accesorio' o 'mantenimiento'.")
+				return render(request, "search.html", {'search_term': search_term})
+			else:
+				messages.success(request, f"Se encontraron {searched_products.count()} productos para '{search_term}'.")
+				return render(request, "search.html", {
+					'searched': searched_products,
+					'search_term': search_term
+				})
 		else:
-			return render(request, "search.html", {'searched':searched})
+			messages.error(request, "Por favor ingresa un término de búsqueda.")
+			return render(request, "search.html", {})
 	else:
 		return render(request, "search.html", {})	
 
@@ -102,7 +147,7 @@ def update_user(request):
 
 
 def category_summary(request):
-	categories = Category.objects.all()
+	categories = Category.objects.filter(parent=None)  # Solo categorías principales
 	return render(request, 'category_summary.html', {"categories":categories})	
 
 def category(request, foo):
@@ -112,12 +157,67 @@ def category(request, foo):
 	try:
 		# Look Up The Category
 		category = Category.objects.get(name=foo)
-		products = Product.objects.filter(category=category)
-		return render(request, 'category.html', {'products':products, 'category':category})
-	except:
+		products = category.get_all_products()  # Usar el nuevo método
+		
+		# Obtener subcategorías si es una categoría principal
+		subcategories = category.subcategories.filter(is_active=True) if category.is_parent else None
+		
+		# Verificar si es la categoría "Armas" que requiere verificación de edad
+		if category.name.lower() == 'armas':
+			return render(request, 'age_verification.html', {
+				'products': products, 
+				'category': category,
+				'subcategories': subcategories
+			})
+		
+		return render(request, 'category.html', {
+			'products': products, 
+			'category': category,
+			'subcategories': subcategories
+		})
+	except Category.DoesNotExist:
 		messages.success(request, ("That Category Doesn't Exist..."))
 		return redirect('home')
 
+def subcategory(request, parent_slug, subcategory_slug):
+	"""Vista para subcategorías específicas"""
+	parent_name = parent_slug.replace('-', ' ')
+	subcategory_name = subcategory_slug.replace('-', ' ')
+	
+	try:
+		parent_category = Category.objects.get(name=parent_name, parent=None)
+		subcategory = Category.objects.get(name=subcategory_name, parent=parent_category)
+		products = Product.objects.filter(category=subcategory)
+		
+		return render(request, 'subcategory.html', {
+			'products': products,
+			'subcategory': subcategory,
+			'parent_category': parent_category
+		})
+	except Category.DoesNotExist:
+		messages.error(request, "La subcategoría solicitada no existe.")
+		return redirect('home')
+
+def categories_ajax(request):
+	"""Vista AJAX para obtener categorías en formato JSON"""
+	categories_data = []
+	for category in Category.objects.filter(parent=None, is_active=True):
+		subcategories = []
+		for sub in category.subcategories.filter(is_active=True):
+			subcategories.append({
+				'id': sub.id,
+				'name': sub.name,
+				'product_count': Product.objects.filter(category=sub).count()
+			})
+		
+		categories_data.append({
+			'id': category.id,
+			'name': category.name,
+			'product_count': category.get_all_products().count(),
+			'subcategories': subcategories
+		})
+	
+	return JsonResponse({'categories': categories_data})
 
 def product(request,pk):
 	product = Product.objects.get(id=pk)
@@ -134,32 +234,66 @@ def about(request):
 
 def login_user(request):
 	if request.method == "POST":
-		username = request.POST['username']
-		password = request.POST['password']
-		user = authenticate(request, username=username, password=password)
-		if user is not None:
-			login(request, user)
+		email = request.POST.get('email', '').strip()
+		password = request.POST.get('password', '')
+		
+		# Validar que se proporcionaron credenciales
+		if not email or not password:
+			messages.error(request, "Por favor ingresa correo electrónico y contraseña.")
+			return render(request, 'login.html', {})
+		
+		# Buscar usuarios activos por email
+		try:
+			users_with_email = User.objects.filter(email=email, is_active=True)
+			
+			if not users_with_email.exists():
+				messages.error(request, "No existe una cuenta activa con este correo electrónico.")
+				return render(request, 'login.html', {})
+			
+			# Intentar autenticar con cada usuario que tenga ese email
+			authenticated_user = None
+			for user_obj in users_with_email:
+				test_user = authenticate(request, username=user_obj.username, password=password)
+				if test_user is not None:
+					authenticated_user = test_user
+					break
+			
+			if authenticated_user is None:
+				messages.error(request, "Correo electrónico o contraseña incorrectos. Intenta de nuevo.")
+				return render(request, 'login.html', {})
+			
+			# Login exitoso
+			login(request, authenticated_user)
 
-			# Do some shopping cart stuff
-			current_user = Profile.objects.get(user__id=request.user.id)
+			# Crear perfil si no existe
+			try:
+				current_user = Profile.objects.get(user__id=request.user.id)
+			except Profile.DoesNotExist:
+				current_user = Profile.objects.create(user=request.user)
+			
 			# Get their saved cart from database
 			saved_cart = current_user.old_cart
 			# Convert database string to python dictionary
 			if saved_cart:
-				# Convert to dictionary using JSON
-				converted_cart = json.loads(saved_cart)
-				# Add the loaded cart dictionary to our session
-				# Get the cart
-				cart = Cart(request)
-				# Loop thru the cart and add the items from the database
-				for key,value in converted_cart.items():
-					cart.db_add(product=key, quantity=value)
+				try:
+					# Convert to dictionary using JSON
+					converted_cart = json.loads(saved_cart)
+					# Add the loaded cart dictionary to our session
+					# Get the cart
+					cart = Cart(request)
+					# Loop thru the cart and add the items from the database
+					for key,value in converted_cart.items():
+						cart.db_add(product=key, quantity=value)
+				except json.JSONDecodeError:
+					# Si hay error en el JSON, continuar sin carrito guardado
+					pass
 
-			messages.success(request, ("You Have Been Logged In!"))
+			messages.success(request, f"¡Bienvenido {authenticated_user.username}! Has iniciado sesión correctamente.")
 			return redirect('home')
-		else:
-			messages.success(request, ("There was an error, please try again..."))
-			return redirect('login')
+			
+		except Exception as e:
+			messages.error(request, "Error al procesar el login. Intenta de nuevo.")
+			return render(request, 'login.html', {})
 
 	else:
 		return render(request, 'login.html', {})
@@ -314,3 +448,75 @@ Estás recibiendo este e-mail porque comenzaste una compra en MiMarca.\n\nTe env
                 )
         return JsonResponse({'status': 'ok'})
     return JsonResponse({'status': 'only POST allowed'})
+
+
+def is_superuser(user):
+    """Verificar si el usuario es superusuario"""
+    return user.is_superuser
+
+@user_passes_test(is_superuser)
+def visit_stats(request):
+    """Vista de estadísticas de visitas - Solo para superusuarios"""
+    from .models import VisitCounter, VisitSummary
+    
+    # Estadísticas generales
+    total_visits = VisitCounter.objects.count()
+    
+    # Visitas de los últimos 7 días
+    seven_days_ago = datetime.now() - timedelta(days=7)
+    recent_visits = VisitCounter.objects.filter(timestamp__gte=seven_days_ago).count()
+    
+    # Visitantes únicos (por IP)
+    unique_visitors = VisitCounter.objects.values('ip_address').distinct().count()
+    
+    # Visitas por día (últimos 30 días)
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    daily_stats = VisitSummary.objects.filter(
+        date__gte=thirty_days_ago.date()
+    ).order_by('-date')[:30]
+    
+    # Páginas más visitadas
+    popular_pages = VisitCounter.objects.values('page_url').annotate(
+        visit_count=Count('page_url')
+    ).order_by('-visit_count')[:10]
+    
+    # Navegadores más usados
+    browsers = VisitCounter.objects.values('browser').annotate(
+        count=Count('browser')
+    ).order_by('-count')[:5]
+    
+    # Sistemas operativos
+    operating_systems = VisitCounter.objects.values('operating_system').annotate(
+        count=Count('operating_system')
+    ).order_by('-count')[:5]
+    
+    # Dispositivos móviles vs desktop
+    mobile_visits = VisitCounter.objects.filter(is_mobile=True).count()
+    desktop_visits = VisitCounter.objects.filter(is_mobile=False).count()
+    
+    # Visitas de usuarios registrados vs anónimos
+    logged_visits = VisitCounter.objects.filter(user__isnull=False).count()
+    anonymous_visits = VisitCounter.objects.filter(user__isnull=True).count()
+    
+    # Últimas visitas (paginadas)
+    recent_visits_list = VisitCounter.objects.select_related('user').order_by('-timestamp')
+    paginator = Paginator(recent_visits_list, 20)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'total_visits': total_visits,
+        'recent_visits': recent_visits,
+        'unique_visitors': unique_visitors,
+        'daily_stats': daily_stats,
+        'popular_pages': popular_pages,
+        'browsers': browsers,
+        'operating_systems': operating_systems,
+        'mobile_visits': mobile_visits,
+        'desktop_visits': desktop_visits,
+        'logged_visits': logged_visits,
+        'anonymous_visits': anonymous_visits,
+        'page_obj': page_obj,
+    }
+    
+    return render(request, 'admin/visit_stats.html', context)

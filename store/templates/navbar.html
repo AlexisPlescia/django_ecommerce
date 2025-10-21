@@ -1,13 +1,13 @@
 <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="{% url 'home' %}">Hurlingham Shop</a>
+                <a class="navbar-brand" href="{% url 'home' %}">Armeria Sniper</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Productos</a></li>
                         <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'search' %}">Buscar</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Sobre nosotros</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Como comprar</a></li>
 
             {% if user.is_authenticated %}
               
@@ -16,17 +16,21 @@
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item" href="{% url 'update_user' %}">Perfil de usuario</a></li>
                 <li><hr class="dropdown-divider" /></li>
-<li><a class="dropdown-item" href="{% url 'update_info'  %}">Informacion del usuario</a></li>
+                <li><a class="dropdown-item" href="{% url 'update_info'  %}">Informacion del usuario</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="dropdown-item" href="{% url 'my_reservations' %}"><i class="fas fa-bookmark"></i> Mis Reservas</a></li>
                             </ul>
                         </li>
             {% if user.is_superuser %}
               <li class="nav-item dropdown">
             
-            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Pedidos</a>
+            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administrar</a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item" href="{% url 'shipped_dash' %}">Pedidos enviados</a></li>
                 <li><hr class="dropdown-divider" /></li>
-<li><a class="dropdown-item" href="{% url 'not_shipped_dash'  %}">Pedidos no enviados</a></li>
+                <li><a class="dropdown-item" href="{% url 'not_shipped_dash'  %}">Pedidos no enviados</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="dropdown-item" href="{% url 'admin_reservations' %}"><i class="fas fa-bookmark"></i> Administrar Reservas</a></li>
                             </ul>
                         </li>
             {% endif %}
@@ -45,12 +49,14 @@
 
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Categorías</a>
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Productos</a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{% url 'category_summary' %}">Todos los productos</a></li>
                                 <li><hr class="dropdown-divider" /></li>
-<li><a class="dropdown-item" href="{% url 'category' 'Programming-Books' %}">Programming Books</a></li> <!-- Cambiar por productos  -->
-                                <li><a class="dropdown-item" href="{% url 'category' 'Marketing-Books' %}">Marketing Books</a></li> <!-- Cambiar por productos  -->
+                                <li><a class="dropdown-item" href="{% url 'category' 'Armas' %}">Armas</a></li> <!-- Cambiar por productos  -->
+                                <li><a class="dropdown-item" href="{% url 'category' 'Municiones' %}">Municiones</a></li> <!-- Cambiar por productos  -->
+                                <li><a class="dropdown-item" href="{% url 'category' 'Accesorios' %}">Accesorios</a></li> <!-- Cambiar por productos  -->
+                                <li><a class="dropdown-item" href="{% url 'category' 'Mantenimiento' %}">Mantenimiento</a></li> <!-- Cambiar por productos  -->
                             </ul>
                         </li>
                     </ul>

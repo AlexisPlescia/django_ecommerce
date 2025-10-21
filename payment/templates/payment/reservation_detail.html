@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-bookmark"></i> Detalle de Reserva #{{ reservation.id }}</h2>
+                <a href="{% if user.is_superuser %}{% url 'admin_reservations' %}{% else %}{% url 'my_reservations' %}{% endif %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Información del Producto</h5>
+                            <span class="badge 
+                                {% if reservation.status == 'confirmed' %}badge-success
+                                {% elif reservation.status == 'pending' %}badge-warning
+                                {% elif reservation.status == 'cancelled' %}badge-danger
+                                {% else %}badge-secondary{% endif %}">
+                                {{ reservation.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    {% if reservation.product.image %}
+                                        <img src="{{ reservation.product.image.url }}" class="img-fluid rounded" alt="{{ reservation.product.name }}">
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-8">
+                                    <h4>{{ reservation.product.name }}</h4>
+                                    <p class="text-muted">{{ reservation.product.description }}</p>
+                                    
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Cantidad:</strong></td>
+                                            <td>{{ reservation.quantity }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Precio unitario:</strong></td>
+                                            <td>${{ reservation.product.price }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Total:</strong></td>
+                                            <td class="text-success"><strong>${{ reservation.total_price }}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Stock actual:</strong></td>
+                                            <td>
+                                                {{ reservation.product.stock }}
+                                                {% if reservation.product.is_available %}
+                                                    <span class="badge badge-success">Disponible</span>
+                                                {% else %}
+                                                    <span class="badge badge-danger">Agotado</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Información de la Reserva</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>ID:</strong></td>
+                                    <td>#{{ reservation.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Estado:</strong></td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if reservation.status == 'confirmed' %}badge-success
+                                            {% elif reservation.status == 'pending' %}badge-warning
+                                            {% elif reservation.status == 'cancelled' %}badge-danger
+                                            {% else %}badge-secondary{% endif %}">
+                                            {{ reservation.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fecha de creación:</strong></td>
+                                    <td>{{ reservation.created_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Última actualización:</strong></td>
+                                    <td>{{ reservation.updated_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                {% if reservation.expires_at %}
+                                <tr>
+                                    <td><strong>Expira:</strong></td>
+                                    <td class="text-warning">{{ reservation.expires_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Cliente</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Nombre:</strong></td>
+                                    <td>{{ reservation.customer_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>{{ reservation.customer_email }}</td>
+                                </tr>
+                                {% if reservation.customer_phone %}
+                                <tr>
+                                    <td><strong>Teléfono:</strong></td>
+                                    <td>{{ reservation.customer_phone }}</td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Notificaciones</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-1">
+                                <i class="fas {% if reservation.customer_notified %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %}"></i>
+                                Cliente notificado
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas {% if reservation.admin_notified %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %}"></i>
+                                Admin notificado
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Dirección de Envío</h5>
+                        </div>
+                        <div class="card-body">
+                            <pre>{{ reservation.shipping_address }}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

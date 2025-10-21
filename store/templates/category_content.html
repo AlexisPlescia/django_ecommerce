@@ -1,0 +1,172 @@
+<!-- Contenido de la categoría Armas (después de verificación de edad) -->
+<style>
+.restricted-category-header {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #5d6d7e 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+}
+
+.age-verified-badge {
+    background: rgba(39, 174, 96, 0.2);
+    border: 2px solid #27ae60;
+    color: #27ae60;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+</style>
+
+<header class="restricted-category-header">
+    <div class="container">
+        <div class="age-verified-badge">
+            <i class="fas fa-shield-check"></i> Edad verificada
+        </div>
+        
+        <h1 class="hero-title" style="font-size: 3.5rem; font-weight: 900; text-shadow: 3px 3px 8px rgba(0,0,0,0.8); margin-bottom: 1rem;">
+            {{ category }}
+        </h1>
+        <p class="hero-subtitle" style="font-size: 1.4rem; font-weight: 300; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
+            Sección restringida - Solo para mayores de 18 años
+        </p>
+    </div>
+</header>
+
+<!-- Subcategorías Section -->
+{% if subcategories %}
+<div class="container my-4">
+    <div class="subcategories-section">
+        <h2 class="text-center mb-4">Subcategorías de {{ category }}</h2>
+        <div class="row">
+            {% for subcategory in subcategories %}
+            <div class="col-md-4 col-sm-6 mb-3">
+                <a href="{% url 'subcategory' category.name|slugify subcategory.name|slugify %}" class="subcategory-card">
+                    <div class="subcategory-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h4 class="subcategory-title">{{ subcategory.name }}</h4>
+                    <p class="subcategory-count">
+                        {% with subcategory.get_all_products.count as count %}
+                            {{ count }} producto{{ count|pluralize }}
+                        {% endwith %}
+                    </p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Products Section -->
+<section class="py-5">
+    <div class="container px-4 px-lg-5 mt-5">
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            {% for product in products %}
+                {% if product.is_sale %}
+                <div class="col mb-5">
+                    <div class="card h-100">
+                        <!-- Sale badge-->
+                        <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem; z-index: 3;">Oferta</div>
+
+                        <!-- Product image-->
+                        <div class="card-img-container" style="height: 200px; overflow: hidden; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                            {% if product.image %}
+                                <img class="card-img-top" src="{{ product.image.url }}" alt="..." 
+                                     style="width: 100%; height: 100%; object-fit: contain; object-position: center;" />
+                            {% else %}
+                                <div style="width: 100%; height: 100%; background-color: #e9ecef; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                    <i class="fas fa-image" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Product details-->
+                        <div class="card-body p-4">
+                            <div class="text-center">
+                                <!-- Product name-->
+                                <h5 class="fw-bolder">{{ product.name }}</h5>
+                                
+                                <!-- Stock info -->
+                                <div class="mb-2">
+                                    {% if product.is_in_stock %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check-circle"></i> En stock ({{ product.stock }})
+                                        </small>
+                                    {% else %}
+                                        <small class="text-danger">
+                                            <i class="fas fa-times-circle"></i> Agotado
+                                        </small>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Product price-->
+                                <span class="text-muted text-decoration-line-through">${{ product.price }}</span>
+                                <br>
+                                <span class="text-success fw-bold">${{ product.sale_price }}</span>
+                            </div>
+                        </div>
+                        <!-- Product actions-->
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                            <div class="text-center">
+                                <a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">Ver Producto</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% else %}
+                
+                <div class="col mb-5">
+                    <div class="card h-100">
+                        <!-- Product image-->
+                        <div class="card-img-container" style="height: 200px; overflow: hidden; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                            {% if product.image %}
+                                <img class="card-img-top" src="{{ product.image.url }}" alt="..." 
+                                     style="width: 100%; height: 100%; object-fit: contain; object-position: center;" />
+                            {% else %}
+                                <div style="width: 100%; height: 100%; background-color: #e9ecef; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                    <i class="fas fa-image" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Product details-->
+                        <div class="card-body p-4">
+                            <div class="text-center">
+                                <!-- Product name-->
+                                <h5 class="fw-bolder">{{ product.name }}</h5>
+                                
+                                <!-- Stock info -->
+                                <div class="mb-2">
+                                    {% if product.is_in_stock %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check-circle"></i> En stock ({{ product.stock }})
+                                        </small>
+                                    {% else %}
+                                        <small class="text-danger">
+                                            <i class="fas fa-times-circle"></i> Agotado
+                                        </small>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Product price-->
+                                <span class="text-dark fw-bold">${{ product.price }}</span>
+                            </div>
+                        </div>
+                        <!-- Product actions-->
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                            <div class="text-center">
+                                <a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">Ver Producto</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>

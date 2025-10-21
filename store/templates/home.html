@@ -1,19 +1,166 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 
-        <!-- Header-->
-        <header class="py-5" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); min-height: 400px; position: relative;">
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0); background-size: 20px 20px; z-index: 1;"></div>
-            <div class="container px-4 px-lg-5 my-5" style="position: relative; z-index: 2;">
-                <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder" style="color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hurlingham al mundo 🌍</h1>
-                    <p class="lead fw-normal mb-0" style="color: #e0e0e0 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Compra online , recibilo donde estes</p>
-                </div>
+<!-- Estilos para imágenes uniformes -->
+<style>
+.card-img-container {
+    position: relative;
+    overflow: hidden;
+    background-color: #f8f9fa;
+}
+
+.card-img-top {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+}
+</style>
+
+<!-- Estilos personalizados para el header -->
+<style>
+.hero-header {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1595590424283-b8f17842773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2141&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.hero-content {
+    text-align: center;
+    color: white;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 4.5rem;
+    font-weight: 900;
+    text-shadow: 3px 3px 8px rgba(0,0,0,0.8);
+    margin-bottom: 1.5rem;
+    letter-spacing: 2px;
+}
+
+.hero-subtitle {
+    font-size: 1.8rem;
+    font-weight: 300;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    margin-bottom: 2rem;
+}
+
+.contact-buttons {
+    margin-top: 2rem;
+}
+
+.btn-custom {
+    margin: 0.5rem;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-instagram {
+    background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    border: none;
+    color: white;
+}
+
+.btn-instagram:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.btn-whatsapp {
+    background-color: #25D366;
+    border: 2px solid #25D366;
+    color: white;
+}
+
+.btn-whatsapp:hover {
+    background-color: #128C7E;
+    border-color: #128C7E;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.btn-facebook {
+    background-color: #1877F2;
+    border: 2px solid #1877F2;
+    color: white;
+}
+
+.btn-facebook:hover {
+    background-color: #166FE5;
+    border-color: #166FE5;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 3rem;
+    }
+    .hero-subtitle {
+        font-size: 1.3rem;
+    }
+    .btn-custom {
+        display: block;
+        margin: 0.5rem auto;
+        width: 80%;
+    }
+}
+</style>
+
+<!-- Header con imagen de fondo -->
+<header class="hero-header">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Armería Sniper</h1>
+            <p class="hero-subtitle">Compra online, recibilo donde estés</p>
+            
+            <div class="contact-buttons">
+                <a href="https://instagram.com/armeria_sniper" target="_blank" rel="noopener noreferrer" 
+                   class="btn-custom btn-instagram">
+                    <i class="fab fa-instagram"></i> Síguenos en Instagram
+                </a>
+                <a href="https://facebook.com/armeria_sniper" target="_blank" rel="noopener noreferrer" 
+                   class="btn-custom btn-facebook">
+                    <i class="fab fa-facebook-f"></i> Síguenos en Facebook
+                </a>
+                <a href="https://wa.me/541112345678?text=Hola,%20me%20interesa%20conocer%20más%20sobre%20sus%20productos" 
+                   target="_blank" rel="noopener noreferrer" 
+                   class="btn-custom btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> Chateá con nosotros
+                </a>
+
             </div>
-        </header>
-        <!-- Section-->
+        </div>
+    </div>
+</header>
+<!-- Section-->
         <section class="py-5">
 
             <div class="container px-4 px-lg-5 mt-5">
@@ -26,10 +173,19 @@
                     <div class="col mb-5">
                         <div class="card h-100">
                             <!-- Sale badge-->
-                            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
+                            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem; z-index: 3;">Vendido</div>
 
                             <!-- Product image-->
-                            <img class="card-img-top" src="{{ product.image.url }}" alt="..." />
+                            <div class="card-img-container" style="height: 200px; overflow: hidden; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                {% if product.image %}
+                                    <img class="card-img-top" src="{{ product.image.url }}" alt="..." 
+                                         style="width: 100%; height: 100%; object-fit: contain; object-position: center;" />
+                                {% else %}
+                                    <div style="color: #6c757d; font-size: 3rem;">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
                             <!-- Product details-->
                             <div class="card-body p-4">
                                 <div class="text-center">
@@ -38,7 +194,7 @@
                                     <!-- Sale -->
                 <div class="d-flex justify-content-center small text-warning mb-2">
                 <div class="bi-star-fill"></div>
-                &nbsp;&nbsp;¡Oferta!&nbsp;&nbsp;
+                &nbsp;&nbsp;¡Vendido!&nbsp;&nbsp;
                 <div class="bi-star-fill"></div>
                 </div>
 
@@ -64,7 +220,16 @@
                 <div class="col mb-5">
                         <div class="card h-100">
                             <!-- Product image-->
-                            <img class="card-img-top" src="{{ product.image.url }}" alt="..." />
+                            <div class="card-img-container" style="height: 200px; overflow: hidden; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                {% if product.image %}
+                                    <img class="card-img-top" src="{{ product.image.url }}" alt="..." 
+                                         style="width: 100%; height: 100%; object-fit: contain; object-position: center;" />
+                                {% else %}
+                                    <div style="color: #6c757d; font-size: 3rem;">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
                             <!-- Product details-->
                             <div class="card-body p-4">
                                 <div class="text-center">

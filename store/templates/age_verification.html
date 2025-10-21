@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+.age-verification-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+.age-verification-modal {
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.age-verification-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.age-verification-text {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.age-verification-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    color: #856404;
+}
+
+.btn-age-verify {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    border: none;
+    margin: 0.5rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-age-yes {
+    background: linear-gradient(45deg, #27ae60, #2ecc71);
+    color: white;
+}
+
+.btn-age-yes:hover {
+    background: linear-gradient(45deg, #219a52, #27ae60);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3);
+    color: white;
+}
+
+.btn-age-no {
+    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    color: white;
+}
+
+.btn-age-no:hover {
+    background: linear-gradient(45deg, #c0392b, #a93323);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
+    color: white;
+}
+
+.warning-icon {
+    font-size: 4rem;
+    color: #f39c12;
+    margin-bottom: 1rem;
+}
+
+.age-disclaimer {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-top: 1rem;
+    font-style: italic;
+}
+</style>
+
+<div class="age-verification-overlay" id="ageVerificationModal">
+    <div class="age-verification-modal">
+        <div class="warning-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        
+        <h2 class="age-verification-title">
+            Verificación de Edad
+        </h2>
+        
+        <p class="age-verification-text">
+            Estás intentando acceder a la sección de <strong>armas de fuego</strong>. 
+            Por regulaciones legales, necesitamos confirmar que eres mayor de edad.
+        </p>
+        
+        <div class="age-verification-warning">
+            <i class="fas fa-info-circle"></i>
+            <strong>Importante:</strong> Solo personas mayores de 18 años pueden acceder a esta sección.
+        </div>
+        
+        <h3 style="color: #2c3e50; margin-bottom: 1.5rem;">
+            ¿Eres mayor de 18 años?
+        </h3>
+        
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <button class="btn btn-age-verify btn-age-yes" onclick="confirmAge(true)">
+                <i class="fas fa-check"></i> Sí, soy mayor de 18 años
+            </button>
+            
+            <button class="btn btn-age-verify btn-age-no" onclick="confirmAge(false)">
+                <i class="fas fa-times"></i> No soy mayor de edad
+            </button>
+        </div>
+        
+        <p class="age-disclaimer">
+            Al confirmar, declaras bajo tu responsabilidad que cumples con los requisitos de edad.
+        </p>
+    </div>
+</div>
+
+<!-- Contenido oculto hasta verificación -->
+<div id="categoryContent" style="display: none;">
+    <!-- Aquí irá el contenido normal de la categoría -->
+    {% include 'category_content.html' %}
+</div>
+
+<script>
+function confirmAge(isAdult) {
+    if (isAdult) {
+        // Guardar en localStorage que ya verificó la edad (por 24 horas)
+        const expirationTime = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 horas
+        localStorage.setItem('ageVerified_armas', expirationTime);
+        
+        // Ocultar modal y mostrar contenido
+        document.getElementById('ageVerificationModal').style.display = 'none';
+        document.getElementById('categoryContent').style.display = 'block';
+        
+        // Mostrar mensaje de bienvenida
+        showSuccessMessage();
+        
+    } else {
+        // Redirigir a página de inicio con mensaje
+        alert('Debes ser mayor de 18 años para acceder a esta sección.');
+        window.location.href = "{% url 'home' %}";
+    }
+}
+
+function showSuccessMessage() {
+    // Crear y mostrar mensaje de éxito temporal
+    const successDiv = document.createElement('div');
+    successDiv.className = 'alert alert-success alert-dismissible fade show';
+    successDiv.style.position = 'fixed';
+    successDiv.style.top = '20px';
+    successDiv.style.right = '20px';
+    successDiv.style.zIndex = '10000';
+    successDiv.innerHTML = `
+        <i class="fas fa-check-circle"></i> 
+        <strong>Verificación completada.</strong> Bienvenido a la sección de armas.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(successDiv);
+    
+    // Remover después de 5 segundos
+    setTimeout(() => {
+        if (successDiv.parentNode) {
+            successDiv.parentNode.removeChild(successDiv);
+        }
+    }, 5000);
+}
+
+// Verificar si ya se validó la edad recientemente
+document.addEventListener('DOMContentLoaded', function() {
+    const ageVerified = localStorage.getItem('ageVerified_armas');
+    const currentTime = new Date().getTime();
+    
+    if (ageVerified && currentTime < parseInt(ageVerified)) {
+        // Ya verificó y no ha expirado, mostrar contenido directamente
+        document.getElementById('ageVerificationModal').style.display = 'none';
+        document.getElementById('categoryContent').style.display = 'block';
+    }
+    // Si no ha verificado o expiró, el modal se muestra por defecto
+});
+</script>
+
+{% endblock %}

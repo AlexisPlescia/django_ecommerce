@@ -12,4 +12,8 @@ urlpatterns = [
     path('orders/<int:pk>', views.orders, name='orders'),
     path('paypal', include("paypal.standard.ipn.urls")),
 
+    # URLs para sistema de reservas
+    path('my_reservations/', views.my_reservations, name='my_reservations'),
+    path('reservation/<int:reservation_id>/', views.reservation_detail, name='reservation_detail'),
+    path('admin_reservations/', views.admin_reservations, name='admin_reservations'),
 ]

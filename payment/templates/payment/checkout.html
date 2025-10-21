@@ -8,17 +8,11 @@
             <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0); background-size: 20px 20px; z-index: 1;"></div>
             <div class="container px-4 px-lg-5 my-5" style="position: relative; z-index: 2;">
                 <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder" style="color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Checkout</h1>
-                    <p class="lead fw-normal mb-0" style="color: #e0e0e0 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Finaliza tu compra...</p>
+                    <h1 class="display-4 fw-bolder" style="color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Reserva de Productos</h1>
+                    <p class="lead fw-normal mb-0" style="color: #e0e0e0 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Confirma tu reserva...</p>
                 </div>
             </div>
         </header>
-            <div class="container px-4 px-lg-5 my-5">
-                <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder">Finaliza tu compra !</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">Revisando la orden..</p>
-                </div>
-            </div>
         </header>
         <br/>
         <div class="container">
@@ -27,26 +21,39 @@
                     <div class="col-md-6 offset-md-3">
           <div class="card">
           <div class="card-header">
-            Resumen del Pedido
+            Resumen de la Reserva
           </div>
           <div class="card-body">
             {% for product in cart_products %}
-                {{ product.name }}: 
+                <div class="mb-3 p-2 border-bottom">
+                    <strong>{{ product.name }}</strong>
+                    <br/>
+                    Precio: 
                     {% if product.is_sale %}
                         ${{ product.sale_price }}
                     {% else %}
                         ${{ product.price }}
-                {% endif %}
-
-                <br/>
-                <small>Cantidad: 
-                {% for key, value in quantities.items %}
-                    {% if key == product.id|slugify %}
-                        {{ value }}
                     {% endif %}
-                {% endfor %}</small>
-                <br/><br/>
-
+                    <br/>
+                    <small>Cantidad: 
+                    {% for key, value in quantities.items %}
+                        {% if key == product.id|slugify %}
+                            {{ value }}
+                        {% endif %}
+                    {% endfor %}</small>
+                    <br/>
+                    <small>
+                        {% if product.is_in_stock %}
+                            <span class="text-success">
+                                <i class="fas fa-check-circle"></i> Disponible ({{ product.stock }} en stock)
+                            </span>
+                        {% else %}
+                            <span class="text-danger">
+                                <i class="fas fa-times-circle"></i> Sin stock
+                            </span>
+                        {% endif %}
+                    </small>
+                </div>
             {% endfor %}
             Total:  ${{ totals }}
             <br/><br/>
@@ -56,9 +63,13 @@
 <br/><br/>
 <div class="card">
   <div class="card-header">
-    Informacion del pedido
+    Información de Entrega
   </div>
   <div class="card-body">
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>Sistema de Reservas:</strong> Al confirmar, los productos serán apartados para ti y recibirás un email de confirmación. Nos pondremos en contacto contigo para coordinar la entrega.
+    </div>
     <form method="POST" action="{% url 'billing_info' %}">
         {% csrf_token %}
     {{ shipping_form.as_p }}
@@ -66,8 +77,8 @@
 </div>
 <br/>
 
-<button type="submit" class="btn btn-secondary">
-        Continuar pedido
+<button type="submit" class="btn btn-success">
+        <i class="fas fa-bookmark"></i> Confirmar Reserva
 </button>
 
 </form>

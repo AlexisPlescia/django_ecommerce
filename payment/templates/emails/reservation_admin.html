@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Nueva Reserva Recibida - Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 0 0 5px 5px;
+        }
+        .reservation-item {
+            background-color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #dc3545;
+        }
+        .customer-info {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .total {
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .alert {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔔 Nueva Reserva Recibida</h1>
+    </div>
+    
+    <div class="content">
+        <h2>Nueva reserva en el sistema</h2>
+        
+        <div class="customer-info">
+            <h3>👤 Información del Cliente:</h3>
+            <p><strong>Nombre:</strong> {{ customer_name }}</p>
+            <p><strong>Email:</strong> {{ customer_email }}</p>
+            <p><strong>Fecha de reserva:</strong> {{ reservations.0.created_at|date:"d/m/Y H:i" }}</p>
+        </div>
+        
+        <h3>📦 Productos Reservados:</h3>
+        {% for reservation in reservations %}
+        <div class="reservation-item">
+            <h4>{{ reservation.product.name }}</h4>
+            <p><strong>ID Reserva:</strong> #{{ reservation.id }}</p>
+            <p><strong>Cantidad:</strong> {{ reservation.quantity }}</p>
+            <p><strong>Precio unitario:</strong> ${{ reservation.product.price }}</p>
+            <p><strong>Subtotal:</strong> ${{ reservation.total_price }}</p>
+            <p><strong>Stock restante:</strong> {{ reservation.product.stock }}</p>
+            <p><strong>Estado del producto:</strong> 
+                {% if reservation.product.is_available %}
+                    ✅ Disponible
+                {% else %}
+                    ❌ Agotado
+                {% endif %}
+            </p>
+        </div>
+        {% endfor %}
+        
+        <div class="total">
+            <h3>💰 Total de la Reserva: ${{ total_amount }}</h3>
+        </div>
+        
+        <h3>🚚 Dirección de Envío:</h3>
+        <div style="background-color: white; padding: 15px; border-radius: 5px;">
+            <pre>{{ shipping_address }}</pre>
+        </div>
+        
+        <div class="alert">
+            <h4>⚡ Acciones Requeridas:</h4>
+            <ul>
+                <li>El stock ha sido automáticamente descontado</li>
+                <li>Contactar al cliente para coordinar entrega</li>
+                <li>Verificar disponibilidad de productos</li>
+                <li>Procesar el pedido según el flujo establecido</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <p><em>Este correo se generó automáticamente desde el sistema de reservas.</em></p>
+        </div>
+    </div>
+</body>
+</html>

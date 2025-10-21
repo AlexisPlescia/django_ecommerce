@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Confirmación de Reserva</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 0 0 5px 5px;
+        }
+        .reservation-item {
+            background-color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .total {
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>¡Reserva Confirmada!</h1>
+    </div>
+    
+    <div class="content">
+        <h2>Hola {{ customer_name }},</h2>
+        
+        <p>Tu reserva ha sido confirmada exitosamente. A continuación encontrarás los detalles:</p>
+        
+        <h3>Productos Reservados:</h3>
+        {% for reservation in reservations %}
+        <div class="reservation-item">
+            <h4>{{ reservation.product.name }}</h4>
+            <p><strong>Cantidad:</strong> {{ reservation.quantity }}</p>
+            <p><strong>Precio unitario:</strong> ${{ reservation.product.price }}</p>
+            <p><strong>Subtotal:</strong> ${{ reservation.total_price }}</p>
+            <p><strong>Estado:</strong> {{ reservation.get_status_display }}</p>
+            <p><strong>Fecha de reserva:</strong> {{ reservation.created_at|date:"d/m/Y H:i" }}</p>
+        </div>
+        {% endfor %}
+        
+        <div class="total">
+            <h3>Total de la Reserva: ${{ total_amount }}</h3>
+        </div>
+        
+        <h3>Dirección de Envío:</h3>
+        <div style="background-color: white; padding: 15px; border-radius: 5px;">
+            <pre>{{ shipping_address }}</pre>
+        </div>
+        
+        <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-top: 20px;">
+            <h4>⚠️ Información Importante:</h4>
+            <ul>
+                <li>Tu reserva está confirmada y el stock ha sido apartado para ti.</li>
+                <li>Los productos reservados no estarán disponibles para otros clientes.</li>
+                <li>Te contactaremos pronto para coordinar la entrega.</li>
+                <li>Si tienes alguna pregunta, no dudes en contactarnos.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Gracias por tu confianza</p>
+        <p>Equipo de E-commerce</p>
+    </div>
+</body>
+</html>

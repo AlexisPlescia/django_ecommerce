@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h2><i class="fas fa-check-circle"></i> ¡Reserva Confirmada!</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success text-center" role="alert">
+                        <h4>¡Excelente!</h4>
+                        <p>Tu reserva ha sido procesada exitosamente.</p>
+                        <p><strong>Total de productos reservados: {{ total_reservations }}</strong></p>
+                    </div>
+                    
+                    <h4>Detalles de tu reserva:</h4>
+                    
+                    {% for reservation in reservations %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="card-title">{{ reservation.product.name }}</h5>
+                                    <p class="card-text">
+                                        <strong>Cantidad:</strong> {{ reservation.quantity }}<br>
+                                        <strong>Precio unitario:</strong> ${{ reservation.product.price }}<br>
+                                        <strong>Subtotal:</strong> ${{ reservation.total_price }}<br>
+                                        <strong>Estado:</strong> 
+                                        <span class="badge badge-success">{{ reservation.get_status_display }}</span><br>
+                                        <strong>Fecha:</strong> {{ reservation.created_at|date:"d/m/Y H:i" }}
+                                    </p>
+                                </div>
+                                <div class="col-md-4">
+                                    {% if reservation.product.image %}
+                                        <img src="{{ reservation.product.image.url }}" class="img-fluid rounded" alt="{{ reservation.product.name }}">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="alert alert-info" role="alert">
+                        <h5><i class="fas fa-info-circle"></i> Información importante:</h5>
+                        <ul class="mb-0">
+                            <li>Hemos enviado un correo de confirmación a tu email</li>
+                            <li>Los productos han sido apartados para ti</li>
+                            <li>Nos pondremos en contacto contigo pronto para coordinar la entrega</li>
+                            <li>Puedes consultar el estado de tus reservas en cualquier momento</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'my_reservations' %}" class="btn btn-primary me-2">
+                                <i class="fas fa-list"></i> Ver mis reservas
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'home' %}" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> Volver al inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

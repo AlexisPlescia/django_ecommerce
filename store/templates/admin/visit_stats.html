@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+.stats-dashboard {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.stats-number {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stats-label {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 0;
+}
+
+.stats-icon {
+    font-size: 3rem;
+    opacity: 0.3;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin: 2rem 0;
+}
+
+.visits-table {
+    font-size: 0.9rem;
+}
+
+.superuser-badge {
+    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    display: inline-block;
+}
+
+.metric-positive {
+    color: #27ae60;
+}
+
+.metric-neutral {
+    color: #3498db;
+}
+
+.metric-warning {
+    color: #f39c12;
+}
+
+.page-url {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.browser-bar {
+    height: 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    background: #ecf0f1;
+}
+
+.browser-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.chrome-color { background: #4285f4; }
+.firefox-color { background: #ff7139; }
+.safari-color { background: #00d4aa; }
+.edge-color { background: #0078d4; }
+.other-color { background: #95a5a6; }
+</style>
+
+<div class="stats-dashboard">
+    <div class="container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="display-4">📊 Estadísticas de Visitas</h1>
+            <div class="superuser-badge">
+                <i class="fas fa-shield-alt"></i> Solo Superusuarios
+            </div>
+        </div>
+
+        <!-- Métricas principales -->
+        <div class="row">
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card text-center position-relative">
+                    <i class="fas fa-eye stats-icon"></i>
+                    <h2 class="stats-number metric-positive">{{ total_visits|floatformat:0 }}</h2>
+                    <p class="stats-label">Visitas Totales</p>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card text-center position-relative">
+                    <i class="fas fa-users stats-icon"></i>
+                    <h2 class="stats-number metric-neutral">{{ unique_visitors|floatformat:0 }}</h2>
+                    <p class="stats-label">Visitantes Únicos</p>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card text-center position-relative">
+                    <i class="fas fa-calendar-week stats-icon"></i>
+                    <h2 class="stats-number metric-warning">{{ recent_visits|floatformat:0 }}</h2>
+                    <p class="stats-label">Últimos 7 días</p>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="stats-card text-center position-relative">
+                    <i class="fas fa-mobile-alt stats-icon"></i>
+                    <h2 class="stats-number metric-positive">{{ mobile_visits|floatformat:0 }}</h2>
+                    <p class="stats-label">Visitas Móviles</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos y estadísticas detalladas -->
+        <div class="row">
+            <!-- Páginas más visitadas -->
+            <div class="col-lg-6">
+                <div class="stats-card">
+                    <h3><i class="fas fa-fire"></i> Páginas más visitadas</h3>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Página</th>
+                                    <th class="text-end">Visitas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for page in popular_pages %}
+                                <tr>
+                                    <td class="page-url" title="{{ page.page_url }}">
+                                        {{ page.page_url|truncatechars:50 }}
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="badge bg-primary">{{ page.visit_count }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegadores -->
+            <div class="col-lg-6">
+                <div class="stats-card">
+                    <h3><i class="fas fa-globe"></i> Navegadores más usados</h3>
+                    {% for browser in browsers %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>{{ browser.browser }}</span>
+                            <span>{{ browser.count }} visitas</span>
+                        </div>
+                        <div class="browser-bar">
+                            <div class="browser-fill {% if browser.browser == 'Chrome' %}chrome-color{% elif browser.browser == 'Firefox' %}firefox-color{% elif browser.browser == 'Safari' %}safari-color{% elif browser.browser == 'Edge' %}edge-color{% else %}other-color{% endif %}" 
+                                 style="width: {{ browser.count|floatformat:0 }}%;"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas adicionales -->
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="stats-card">
+                    <h4><i class="fas fa-desktop"></i> Tipo de dispositivo</h4>
+                    <div class="text-center">
+                        <canvas id="deviceChart" width="200" height="200"></canvas>
+                        <div class="mt-3">
+                            <div><i class="fas fa-mobile-alt text-primary"></i> Móvil: {{ mobile_visits }}</div>
+                            <div><i class="fas fa-desktop text-success"></i> Desktop: {{ desktop_visits }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="stats-card">
+                    <h4><i class="fas fa-user-check"></i> Usuarios vs Anónimos</h4>
+                    <div class="text-center">
+                        <canvas id="userChart" width="200" height="200"></canvas>
+                        <div class="mt-3">
+                            <div><i class="fas fa-user text-primary"></i> Registrados: {{ logged_visits }}</div>
+                            <div><i class="fas fa-user-secret text-warning"></i> Anónimos: {{ anonymous_visits }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="stats-card">
+                    <h4><i class="fas fa-cog"></i> Sistemas Operativos</h4>
+                    {% for os in operating_systems %}
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span>
+                            <i class="fab fa-{% if os.operating_system == 'Windows' %}windows{% elif os.operating_system == 'macOS' %}apple{% elif os.operating_system == 'Linux' %}linux{% elif os.operating_system == 'Android' %}android{% else %}question-circle{% endif %}"></i>
+                            {{ os.operating_system }}
+                        </span>
+                        <span class="badge bg-secondary">{{ os.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de visitas recientes -->
+        <div class="stats-card">
+            <h3><i class="fas fa-history"></i> Visitas recientes</h3>
+            <div class="table-responsive">
+                <table class="table visits-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Usuario</th>
+                            <th>IP</th>
+                            <th>Página</th>
+                            <th>Navegador</th>
+                            <th>Dispositivo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visit in page_obj %}
+                        <tr>
+                            <td>{{ visit.timestamp|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if visit.user %}
+                                    <span class="badge bg-primary">{{ visit.user.username }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Anónimo</span>
+                                {% endif %}
+                            </td>
+                            <td><code>{{ visit.ip_address }}</code></td>
+                            <td class="page-url" title="{{ visit.page_url }}">
+                                {{ visit.page_url|truncatechars:40 }}
+                            </td>
+                            <td>{{ visit.browser }}</td>
+                            <td>
+                                {% if visit.is_mobile %}
+                                    <i class="fas fa-mobile-alt text-primary" title="Móvil"></i>
+                                {% else %}
+                                    <i class="fas fa-desktop text-success" title="Desktop"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            {% if page_obj.has_other_pages %}
+            <nav>
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">Primera</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Gráfico de dispositivos
+const deviceCtx = document.getElementById('deviceChart').getContext('2d');
+new Chart(deviceCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Móvil', 'Desktop'],
+        datasets: [{
+            data: [{{ mobile_visits }}, {{ desktop_visits }}],
+            backgroundColor: ['#3498db', '#27ae60'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+// Gráfico de usuarios
+const userCtx = document.getElementById('userChart').getContext('2d');
+new Chart(userCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Registrados', 'Anónimos'],
+        datasets: [{
+            data: [{{ logged_visits }}, {{ anonymous_visits }}],
+            backgroundColor: ['#3498db', '#f39c12'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}

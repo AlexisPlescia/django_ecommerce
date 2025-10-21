@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'store.middleware.VisitCounterMiddleware',  # Nuestro middleware de contador de visitas
 ]
 
 ROOT_URLCONF = 'ecom.urls'
@@ -153,9 +154,9 @@ MERCADOPAGO_PUBLIC_KEY = 'APP_USR-2d14c31c-e478-4ef1-b5f9-4468c4e8c645'
 
 # Configuración de email para envío automático
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.tu-proveedor.com'  # Cambia esto por tu servidor SMTP
+EMAIL_HOST = 'smtp.gmail.com'  # Cambia esto por tu servidor SMTP
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'tu-email@tudominio.com'  # Cambia esto por tu email
+EMAIL_HOST_USER = 'alexisplescia@gmail.com'  # Cambia esto por tu email
 EMAIL_HOST_PASSWORD = 'tu-contraseña'       # Cambia esto por tu contraseña
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

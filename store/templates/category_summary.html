@@ -1,38 +1,163 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- Header-->
-        <header class="py-5" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); min-height: 400px; position: relative;">
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0); background-size: 20px 20px; z-index: 1;"></div>
-            <div class="container px-4 px-lg-5 my-5" style="position: relative; z-index: 2;">
-                <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder" style="color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Resumen de Categorías</h1>
-                    <p class="lead fw-normal mb-0" style="color: #e0e0e0 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Todas las categorías disponibles...</p>
-                </div>
-            </div>
-        </header>
-            <div class="container px-4 px-lg-5 my-5">
-                <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder">Categories</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">Choose Your Category Below...</p>
-                </div>
-            </div>
-        </header>
+<!-- Estilos personalizados para categorías v3.0 - Gris oscuro con inline styles -->
+<style>
+.category-card {
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important;
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    min-height: 204px;
+    width: calc(100% + 4px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
-        <div class="container">
-        	<div class="row">
-        		<center>
-        			<div class="col-8">
-        				<br/><br/>
-                        
-                        {% for category in categories %}
-<h3><a href="{% url 'category' category %}">{{ category }}</a></h3>
+.category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    color: white !important;
+    text-decoration: none;
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+}
 
-                        {% endfor %}
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-        			</div>
-        		</center>
-        	</div>
+.category-armas {
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important;
+}
+
+.category-municiones {
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important;
+}
+
+.category-accesorios {
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important;
+}
+
+.category-mantenimiento {
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important;
+}
+
+.category-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.category-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.category-mantenimiento .category-title {
+    font-size: 1.6rem !important;
+    line-height: 1.2;
+}
+
+.category-description {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .category-card {
+        margin: 0.5rem 0;
+        min-height: 150px;
+    }
+    .category-icon {
+        font-size: 3rem;
+    }
+    .category-title {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+<!-- Header con imagen de armas -->
+<header class="py-5" style="
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1595590424283-b8f17842773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2141&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+">
+    <div class="container px-4 px-lg-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder" style="color: #ffffff !important; text-shadow: 3px 3px 8px rgba(0,0,0,0.8);">Nuestras Categorías</h1>
+            <p class="lead fw-normal mb-0" style="color: #f8f9fa !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Explora nuestra amplia gama de productos</p>
         </div>
+    </div>
+</header>
+
+<!-- Sección de categorías -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            {% for category in categories %}
+                <div class="col-md-6 col-lg-3">
+                    {% if "Armas" in category %}
+                        <a href="{% url 'category' category %}" class="category-card category-armas" 
+                           style="background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important; color: white !important; min-height: 204px;">
+                            <div class="category-icon">
+                                <i class="fas fa-crosshairs"></i>
+                            </div>
+                            <h3 class="category-title">{{ category }}</h3>
+                            <p class="category-description">Armas de fuego y equipamiento táctico profesional</p>
+                        </a>
+                    {% elif "Municiones" in category %}
+                        <a href="{% url 'category' category %}" class="category-card category-municiones"
+                           style="background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important; color: white !important; min-height: 204px;">
+                            <div class="category-icon">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <h3 class="category-title">{{ category }}</h3>
+                            <p class="category-description">Munición de alta calidad para todas las necesidades</p>
+                        </a>
+                    {% elif "Accesorios" in category %}
+                        <a href="{% url 'category' category %}" class="category-card category-accesorios"
+                           style="background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important; color: white !important; min-height: 204px;">
+                            <div class="category-icon">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <h3 class="category-title">{{ category }}</h3>
+                            <p class="category-description">Accesorios y complementos para tu equipo</p>
+                        </a>
+                    {% elif "Mantenimiento" in category %}
+                        <a href="{% url 'category' category %}" class="category-card category-mantenimiento"
+                           style="background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important; color: white !important; min-height: 204px;">
+                            <div class="category-icon">
+                                <i class="fas fa-wrench"></i>
+                            </div>
+                            <h3 class="category-title" style="font-size: 1.6rem !important;">{{ category }}</h3>
+                            <p class="category-description">Cuidado y mantenimiento profesional</p>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'category' category %}" class="category-card"
+                           style="background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important; color: white !important; min-height: 204px;">
+                            <div class="category-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <h3 class="category-title">{{ category }}</h3>
+                            <p class="category-description">Productos especializados</p>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
 {% endblock %}

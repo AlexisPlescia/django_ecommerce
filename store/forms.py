@@ -5,17 +5,44 @@ from .models import Profile
 
 
 class UserInfoForm(forms.ModelForm):
-	phone = forms.CharField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Teléfono'}), required=False)
-	address1 = forms.CharField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Dirección 1'}), required=False)
-	address2 = forms.CharField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Dirección 2'}), required=False)
-	city = forms.CharField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ciudad'}), required=False)
-	state = forms.CharField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Provincia/Estado'}), required=False)
-	zipcode = forms.CharField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Código Postal'}), required=False)
-	country = forms.CharField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'País'}), required=False)
+	# Información de contacto
+	full_name = forms.CharField(
+		label="Nombre completo", 
+		widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Tu nombre completo'}), 
+		required=True
+	)
+	
+	# Información de envío simplificada
+	address1 = forms.CharField(
+		label="Dirección", 
+		widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Calle y número'}), 
+		required=True
+	)
+	city = forms.CharField(
+		label="Ciudad", 
+		widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ciudad'}), 
+		required=True
+	)
+	state = forms.CharField(
+		label="Provincia", 
+		widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Provincia'}), 
+		required=True
+	)
+	zipcode = forms.CharField(
+		label="Código Postal", 
+		widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Código Postal'}), 
+		required=True
+	)
 
 	class Meta:
 		model = Profile
-		fields = ('phone', 'address1', 'address2', 'city', 'state', 'zipcode', 'country', )
+		fields = ('address1', 'city', 'state', 'zipcode')
+	
+	def __init__(self, *args, **kwargs):
+		super(UserInfoForm, self).__init__(*args, **kwargs)
+		# Si hay un usuario, obtener su nombre completo
+		if hasattr(self.instance, 'user'):
+			self.fields['full_name'].initial = f"{self.instance.user.first_name} {self.instance.user.last_name}".strip()
 
 
 

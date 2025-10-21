@@ -1,16 +1,113 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- Header-->
-        <header class="py-5" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); min-height: 400px; position: relative;">
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0); background-size: 20px 20px; z-index: 1;"></div>
-            <div class="container px-4 px-lg-5 my-5" style="position: relative; z-index: 2;">
-                <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder" style="color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Acerca de Nosotros</h1>
-                    <p class="lead fw-normal mb-0" style="color: #e0e0e0 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Conoce más sobre nuestra empresa...</p>
-                </div>
+<!-- Estilos para los botones de redes sociales -->
+<style>
+.contact-buttons {
+    margin-top: 2rem;
+}
+
+.btn-custom {
+    margin: 0.5rem;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-instagram {
+    background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    border: none;
+    color: white;
+}
+
+.btn-instagram:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.btn-facebook {
+    background-color: #1877F2;
+    border: 2px solid #1877F2;
+    color: white;
+}
+
+.btn-facebook:hover {
+    background-color: #166FE5;
+    border-color: #166FE5;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.btn-whatsapp {
+    background-color: #25D366;
+    border: 2px solid #25D366;
+    color: white;
+}
+
+.btn-whatsapp:hover {
+    background-color: #128C7E;
+    border-color: #128C7E;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .btn-custom {
+        display: block;
+        margin: 0.5rem auto;
+        width: 80%;
+    }
+}
+</style>
+
+<header class="hero-header" style="
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1595590424283-b8f17842773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2141&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+">
+
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title" style="font-size: 4rem; font-weight: 900; text-shadow: 3px 3px 8px rgba(0,0,0,0.8); margin-bottom: 1.5rem; color: white; text-align: center;">
+               Armería Sniper
+            </h1>
+            <p class="hero-subtitle" style="font-size: 1.6rem; font-weight: 300; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); margin-bottom: 2rem; color: #f8f9fa;">
+                Comunicate con nosotros, tenemos gran variedad de marcas y poseemos la experiencia necesaria para asesorarte.
+            </p>
+            
+            <!-- Botones de contacto mejorados -->
+    <div class="contact-buttons" style="text-align: center;">
+                <a href="https://instagram.com/armeria_sniper" target="_blank" rel="noopener noreferrer" 
+                   class="btn-custom btn-instagram">
+                    <i class="fab fa-instagram"></i> Síguenos en Instagram
+                </a>
+                <a href="https://facebook.com/armeria_sniper" target="_blank" rel="noopener noreferrer" 
+                   class="btn-custom btn-facebook">
+                    <i class="fab fa-facebook-f"></i> Síguenos en Facebook
+                </a>
+                <a href="https://wa.me/541112345678?text=Hola,%20me%20interesa%20conocer%20más%20sobre%20sus%20productos" 
+                   target="_blank" rel="noopener noreferrer" 
+                   class="btn-custom btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> Chateá con nosotros
+                </a>
+
             </div>
-        </header>
+        </div>
+    </div>
+</header>
+        <!-- Section-->
 
         <div class="container">
         	<div class="row">
@@ -18,22 +115,28 @@
         			<div class="col-8">
         				<br/><br/>
                         <p align="justify" style="color: #333333 !important;">
-                            Somos un emprendimiento familiar de Hurlingham, Buenos Aires, que nació en 2022, en plena pandemia. En medio de los desafíos y la incertidumbre, decidimos apostar al crecimiento y a la conexión con las personas a través de lo que mejor sabemos hacer: ofrecer productos de calidad con atención personalizada.
+                            Realiza tu pedido por WhatsApp o Instagram, te asesoramos y ayudamos a elegir el producto que mejor se adapte a tus necesidades.
                             <br/><br/>
-                            Lo que comenzó como un pequeño proyecto fue creciendo gracias al apoyo de nuestra comunidad y al esfuerzo diario de un equipo comprometido. Hoy somos una tienda online que trabaja para acercarte productos seleccionados, prácticos y al mejor precio, sin que tengas que moverte de tu casa.
+
+                            Para concretar una compra en este sitio, hay que agregar los productos deseados al Carrito de Compras y completar el proceso de pedido online con la información solicitada.
+                            Aclarar en las notas del pedido si preferís que te contactemos por Whatsapp o por mail.
                             <br/><br/>
-                            Nos enfocamos en brindarte una experiencia de compra simple, segura y rápida. Valoramos cada consulta, cada pedido y cada cliente que confía en nosotros. Siempre estamos atentos para ayudarte antes, durante y después de tu compra.
+                            <strong>Utilizamos Andreani, OCA y Via Cargo para despachar los Envíos:</strong> En estos momentos son las que RECOMENDAMOS por la Rapidez, Seguridad y Buen Precio.
                             <br/><br/>
                             Además, estamos activos en redes sociales, donde compartimos novedades, ofertas y un poco del día a día de nuestro emprendimiento. ¡Nos encanta estar cerca de quienes nos eligen!
                         </p>
-                        
+                        <h3>Comprar armas</h3>
+                        <p>
+                        •  IMPORTANTE: si es Personal de alguna FUERZA, los tramites DEBEN ser presentados por el comprador en su delegación.
+                        </p>
+
                         <p style="color: #333333 !important;">
-                            📱 <strong>Instagram:</strong> <a href="https://instagram.com/tunombredeusuario" target="_blank">@tunombredeusuario</a><br/>
-                            💬 <strong>WhatsApp:</strong> <a href="https://wa.me/541112345678" target="_blank">Chateá con nosotros</a>
+                            📱 <strong>Instagram:</strong> <a href="https://instagram.com/tunombredeusuario" target="_blank" rel="noopener noreferrer">@tunombredeusuario</a><br/>
+                            💬 <strong>WhatsApp:</strong> <a href="https://wa.me/541112345678" target="_blank" rel="noopener noreferrer">Chateá con nosotros</a>
                         </p>
                         
                         <p style="color: #333333 !important;">¡Gracias por acompañarnos en este camino. Estamos para vos!</p>
-                        <p style="color: #333333 !important;">El equipo de Hurlingham Shop</p>                        
+                        <p style="color: #333333 !important;">El equipo de Armeria Sniper</p>                        
         			</div>
         		</center>
         	</div>

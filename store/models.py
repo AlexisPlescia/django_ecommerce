@@ -20,6 +20,10 @@ class Profile(models.Model):
 	def __str__(self):
 		return self.user.username
 
+	class Meta:
+		verbose_name = "Perfil"
+		verbose_name_plural = "Perfiles"
+
 # Create a user Profile by default when user signs up
 def create_profile(sender, instance, created, **kwargs):
 	if created:
@@ -67,7 +71,8 @@ class Category(models.Model):
 		return self.parent is not None
 
 	class Meta:
-		verbose_name_plural = 'categories'
+		verbose_name = "Categoría"
+		verbose_name_plural = "Categorías"
 
 
 # Modelo para imágenes adicionales del producto
@@ -80,8 +85,8 @@ class ProductImage(models.Model):
 
 	class Meta:
 		ordering = ['order', 'id']
-		verbose_name = 'Imagen del Producto'
-		verbose_name_plural = 'Imágenes del Producto'
+		verbose_name = "Imagen de Producto"
+		verbose_name_plural = "Imágenes de Productos"
 
 	def __str__(self):
 		return f"{self.product.name} - Imagen {self.order}"
@@ -104,6 +109,10 @@ class Customer(models.Model):
 
 	def __str__(self):
 		return f'{self.first_name} {self.last_name}'
+
+	class Meta:
+		verbose_name = "Cliente"
+		verbose_name_plural = "Clientes"
 
 
 
@@ -177,6 +186,10 @@ class Product(models.Model):
 		
 		return None
 
+	class Meta:
+		verbose_name = "Producto"
+		verbose_name_plural = "Productos"
+
 
 # Customer Orders
 class Order(models.Model):
@@ -191,6 +204,10 @@ class Order(models.Model):
 
 	def __str__(self):
 		return self.product
+
+	class Meta:
+		verbose_name = "Orden"
+		verbose_name_plural = "Órdenes"
 
 
 # Product Reservations
@@ -227,10 +244,13 @@ class Reservation(models.Model):
 	customer_notified = models.BooleanField(default=False)
 	admin_notified = models.BooleanField(default=False)
 	
+	# Estado de conversión a pedido
+	converted_to_order = models.BooleanField(default=False, help_text="Indica si esta reserva se convirtió en un pedido pagado")
+	
 	class Meta:
-		verbose_name = 'Reserva'
-		verbose_name_plural = 'Reservas'
 		ordering = ['-created_at']
+		verbose_name = "Reserva"
+		verbose_name_plural = "Reservas"
 	
 	def __str__(self):
 		return f"Reserva #{self.id} - {self.product.name} ({self.quantity})"
@@ -255,6 +275,33 @@ class Reservation(models.Model):
 		
 		self.status = 'cancelled'
 		self.save()
+	
+	def convert_to_order(self):
+		"""Convierte la reserva en un pedido de payment.Order"""
+		if self.status != 'confirmed':
+			return None
+		
+		if self.converted_to_order:
+			return None  # Ya fue convertida
+		
+		# Importar aquí para evitar importación circular
+		from payment.models import Order as PaymentOrder
+		
+		# Crear el pedido
+		order = PaymentOrder.objects.create(
+			user=self.user,
+			full_name=self.customer_name,
+			email=self.customer_email,
+			shipping_address=self.shipping_address,
+			amount_paid=self.total_price,
+			reservation=self
+		)
+		
+		# Marcar como convertida
+		self.converted_to_order = True
+		self.save()
+		
+		return order
 
 # Modelos para contador de visitas
 class VisitCounter(models.Model):
@@ -283,9 +330,9 @@ class VisitCounter(models.Model):
     city = models.CharField(max_length=100, blank=True, null=True)
     
     class Meta:
-        verbose_name = 'Visita'
-        verbose_name_plural = 'Visitas'
         ordering = ['-timestamp']
+        verbose_name = "Visita"
+        verbose_name_plural = "Visitas"
     
     def __str__(self):
         user_info = f"Usuario: {self.user.username}" if self.user else f"IP: {self.ip_address}"
@@ -303,9 +350,9 @@ class VisitSummary(models.Model):
     desktop_visits = models.PositiveIntegerField(default=0)
     
     class Meta:
-        verbose_name = 'Resumen de Visitas'
-        verbose_name_plural = 'Resúmenes de Visitas'
         ordering = ['-date']
+        verbose_name = "Resumen de Visitas"
+        verbose_name_plural = "Resúmenes de Visitas"
     
     def __str__(self):
         return f"Visitas del {self.date.strftime('%d/%m/%Y')}: {self.total_visits} total"

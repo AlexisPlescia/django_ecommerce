@@ -2,13 +2,45 @@
 
 {% block content %}
 
+<style>
+.reservation-status {
+    color: #000 !important;
+    font-weight: 600;
+}
+
+.badge.bg-success {
+    background-color: #28a745 !important;
+    color: #fff !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+    color: #fff !important;
+}
+
+.badge.bg-info {
+    background-color: #17a2b8 !important;
+    color: #fff !important;
+}
+</style>
+
 <div class="container-fluid my-4">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="fas fa-bookmark"></i> Administrar Reservas</h2>
                 <div>
-                    <span class="badge badge-info">Total: {{ reservations.count }}</span>
+                    <span class="badge bg-info">Total: {{ reservations.count }}</span>
                 </div>
             </div>
             
@@ -82,11 +114,11 @@
                                         <td>{{ reservation.quantity }}</td>
                                         <td class="text-success"><strong>${{ reservation.total_price }}</strong></td>
                                         <td>
-                                            <span class="badge 
-                                                {% if reservation.status == 'confirmed' %}badge-success
-                                                {% elif reservation.status == 'pending' %}badge-warning
-                                                {% elif reservation.status == 'cancelled' %}badge-danger
-                                                {% else %}badge-secondary{% endif %}">
+                                            <span class="badge reservation-status
+                                                {% if reservation.status == 'confirmed' %}bg-success
+                                                {% elif reservation.status == 'pending' %}bg-warning
+                                                {% elif reservation.status == 'cancelled' %}bg-danger
+                                                {% else %}bg-secondary{% endif %}">
                                                 {{ reservation.get_status_display }}
                                             </span>
                                         </td>

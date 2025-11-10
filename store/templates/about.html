@@ -57,7 +57,103 @@
     color: white;
 }
 
+<!-- Estilos personalizados para el header -->
+<style>
+.hero-header {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1595590424283-b8f17842773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2141&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 30vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.hero-content {
+    text-align: center;
+    color: white;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 4.5rem;
+    font-weight: 900;
+    text-shadow: 3px 3px 8px rgba(0,0,0,0.8);
+    margin-bottom: 1.5rem;
+    letter-spacing: 2px;
+}
+
+.hero-subtitle {
+    font-size: 1.8rem;
+    font-weight: 300;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    margin-bottom: 2rem;
+}
+
+.contact-buttons {
+    margin-top: 2rem;
+}
+
+.btn-custom {
+    margin: 0.5rem;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-instagram {
+    background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    border: none;
+    color: white;
+}
+
+.btn-instagram:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.btn-whatsapp {
+    background-color: #25D366;
+    border: 2px solid #25D366;
+    color: white;
+}
+
+.btn-whatsapp:hover {
+    background-color: #128C7E;
+    border-color: #128C7E;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.btn-facebook {
+    background-color: #1877F2;
+    border: 2px solid #1877F2;
+    color: white;
+}
+
+.btn-facebook:hover {
+    background-color: #166FE5;
+    border-color: #166FE5;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
 @media (max-width: 768px) {
+    .hero-title {
+        font-size: 3rem;
+    }
+    .hero-subtitle {
+        font-size: 1.3rem;
+    }
     .btn-custom {
         display: block;
         margin: 0.5rem auto;
@@ -66,29 +162,14 @@
 }
 </style>
 
-<header class="hero-header" style="
-    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1595590424283-b8f17842773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2141&q=80');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    min-height: 60vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-">
-
+<!-- Header con imagen de fondo -->
+<header class="hero-header">
     <div class="container">
         <div class="hero-content">
-            <h1 class="hero-title" style="font-size: 4rem; font-weight: 900; text-shadow: 3px 3px 8px rgba(0,0,0,0.8); margin-bottom: 1.5rem; color: white; text-align: center;">
-               Armería Sniper
-            </h1>
-            <p class="hero-subtitle" style="font-size: 1.6rem; font-weight: 300; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); margin-bottom: 2rem; color: #f8f9fa;">
-                Comunicate con nosotros, tenemos gran variedad de marcas y poseemos la experiencia necesaria para asesorarte.
-            </p>
+            <h1 class="hero-title">Armería Sniper</h1>
+            <p class="hero-subtitle">Comunicate con nosotros, tenemos gran variedad de marcas y poseemos la experiencia necesaria para asesorarte.</p>
             
-            <!-- Botones de contacto mejorados -->
-    <div class="contact-buttons" style="text-align: center;">
+            <div class="contact-buttons">
                 <a href="https://instagram.com/armeria_sniper" target="_blank" rel="noopener noreferrer" 
                    class="btn-custom btn-instagram">
                     <i class="fab fa-instagram"></i> Síguenos en Instagram
@@ -102,7 +183,6 @@
                    class="btn-custom btn-whatsapp">
                     <i class="fab fa-whatsapp"></i> Chateá con nosotros
                 </a>
-
             </div>
         </div>
     </div>

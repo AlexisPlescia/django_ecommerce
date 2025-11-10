@@ -2,6 +2,33 @@
 
 {% block content %}
 
+<style>
+.reservation-status {
+    color: #000 !important;
+    font-weight: 600;
+}
+
+.badge.bg-success {
+    background-color: #28a745 !important;
+    color: #fff !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+    color: #fff !important;
+}
+</style>
+
 <div class="container my-5">
     <div class="row">
         <div class="col-12">
@@ -14,11 +41,11 @@
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Reserva #{{ reservation.id }}</h5>
-                                <span class="badge 
-                                    {% if reservation.status == 'confirmed' %}badge-success
-                                    {% elif reservation.status == 'pending' %}badge-warning
-                                    {% elif reservation.status == 'cancelled' %}badge-danger
-                                    {% else %}badge-secondary{% endif %}">
+                                <span class="badge reservation-status
+                                    {% if reservation.status == 'confirmed' %}bg-success
+                                    {% elif reservation.status == 'pending' %}bg-warning
+                                    {% elif reservation.status == 'cancelled' %}bg-danger
+                                    {% else %}bg-secondary{% endif %}">
                                     {{ reservation.get_status_display }}
                                 </span>
                             </div>

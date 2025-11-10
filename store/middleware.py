@@ -92,7 +92,7 @@ class VisitCounterMiddleware(MiddlewareMixin):
         user = request.user if request.user.is_authenticated else None
         
         try:
-            # Crear registro de visita
+            # Crear registro de visita con timestamp timezone-aware
             visit = VisitCounter.objects.create(
                 ip_address=ip_address,
                 user_agent=user_agent,
@@ -101,7 +101,8 @@ class VisitCounterMiddleware(MiddlewareMixin):
                 referrer=referrer or None,
                 is_mobile=is_mobile,
                 browser=browser,
-                operating_system=operating_system
+                operating_system=operating_system,
+                timestamp=timezone.now()  # Usar timezone.now() explícitamente
             )
             
             # Actualizar resumen diario

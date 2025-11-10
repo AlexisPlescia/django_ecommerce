@@ -1,97 +1,443 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 
-        <!-- Header-->
-        <header class="py-5" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); min-height: 400px; position: relative;">
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0); background-size: 20px 20px; z-index: 1;"></div>
-            <div class="container px-4 px-lg-5 my-5" style="position: relative; z-index: 2;">
-                <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder" style="color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Reserva de Productos</h1>
-                    <p class="lead fw-normal mb-0" style="color: #e0e0e0 !important; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Confirma tu reserva...</p>
-                </div>
+<!-- Estilos personalizados para el header -->
+<style>
+.hero-header {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1595590424283-b8f17842773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2141&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 30vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.hero-content {
+    text-align: center;
+    color: white;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 4.5rem;
+    font-weight: 900;
+    text-shadow: 3px 3px 8px rgba(0,0,0,0.8);
+    margin-bottom: 1.5rem;
+    letter-spacing: 2px;
+}
+
+.hero-subtitle {
+    font-size: 1.8rem;
+    font-weight: 300;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    margin-bottom: 2rem;
+}
+
+.contact-buttons {
+    margin-top: 2rem;
+}
+
+.btn-custom {
+    margin: 0.5rem;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-instagram {
+    background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    border: none;
+    color: white;
+}
+
+.btn-instagram:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.btn-whatsapp {
+    background-color: #25D366;
+    border: 2px solid #25D366;
+    color: white;
+}
+
+.btn-whatsapp:hover {
+    background-color: #128C7E;
+    border-color: #128C7E;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.btn-facebook {
+    background-color: #1877F2;
+    border: 2px solid #1877F2;
+    color: white;
+}
+
+.btn-facebook:hover {
+    background-color: #166FE5;
+    border-color: #166FE5;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 3rem;
+    }
+    .hero-subtitle {
+        font-size: 1.3rem;
+    }
+    .btn-custom {
+        display: block;
+        margin: 0.5rem auto;
+        width: 80%;
+    }
+}
+</style>
+
+<!-- Header con imagen de fondo -->
+<header class="hero-header">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Confirma tu Reserva</h1>
+            <p class="hero-subtitle">Revisa tu selección y completa los datos de entrega</p>
+            
+            <div class="contact-buttons">
+                <a href="https://instagram.com/armeria_sniper" target="_blank" rel="noopener noreferrer" 
+                   class="btn-custom btn-instagram">
+                    <i class="fab fa-instagram"></i> Síguenos en Instagram
+                </a>
+                <a href="https://facebook.com/armeria_sniper" target="_blank" rel="noopener noreferrer" 
+                   class="btn-custom btn-facebook">
+                    <i class="fab fa-facebook-f"></i> Síguenos en Facebook
+                </a>
+                <a href="https://wa.me/541112345678?text=Hola,%20me%20interesa%20conocer%20más%20sobre%20sus%20productos" 
+                   target="_blank" rel="noopener noreferrer" 
+                   class="btn-custom btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> Chateá con nosotros
+                </a>
             </div>
-        </header>
-        </header>
-        <br/>
-        <div class="container">
+        </div>
+    </div>
+</header>
+
+<!-- Contenido principal -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
             <div class="row">
                 
-                    <div class="col-md-6 offset-md-3">
-          <div class="card">
-          <div class="card-header">
-            Resumen de la Reserva
-          </div>
-          <div class="card-body">
-            {% for product in cart_products %}
-                <div class="mb-3 p-2 border-bottom">
-                    <strong>{{ product.name }}</strong>
-                    <br/>
-                    Precio: 
-                    {% if product.is_sale %}
-                        ${{ product.sale_price }}
-                    {% else %}
-                        ${{ product.price }}
-                    {% endif %}
-                    <br/>
-                    <small>Cantidad: 
-                    {% for key, value in quantities.items %}
-                        {% if key == product.id|slugify %}
-                            {{ value }}
-                        {% endif %}
-                    {% endfor %}</small>
-                    <br/>
-                    <small>
-                        {% if product.is_in_stock %}
-                            <span class="text-success">
-                                <i class="fas fa-check-circle"></i> Disponible ({{ product.stock }} en stock)
-                            </span>
-                        {% else %}
-                            <span class="text-danger">
-                                <i class="fas fa-times-circle"></i> Sin stock
-                            </span>
-                        {% endif %}
-                    </small>
+                <!-- Columna izquierda - Resumen de productos -->
+                <div class="col-lg-7 mb-4">
+                    <div class="card border-0 shadow-lg h-100" style="border-radius: 20px;">
+                        <div class="card-header bg-black text-white text-center py-3" style="border-radius: 20px 20px 0 0;">
+                            <h4 class="mb-0">
+                                <i class="fas fa-shopping-bag me-2"></i>
+                                Resumen de tu Reserva
+                            </h4>
+                        </div>
+                        <div class="card-body p-4">
+                            {% for product in cart_products %}
+                                <div class="product-item mb-4 p-3" style="border: 2px solid #f8f9fa; border-radius: 15px; background: linear-gradient(45deg, #f8f9fa, #ffffff);">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-3">
+                                            {% if product.image %}
+                                                <img src="{{ product.image.url }}" class="img-fluid rounded-3 shadow-sm" style="max-height: 80px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-light rounded-3 d-flex align-items-center justify-content-center" style="height: 80px;">
+                                                    <i class="fas fa-image text-muted fa-2x"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6 class="fw-bold text-black mb-1">{{ product.name }}</h6>
+                                            <div class="d-flex align-items-center mb-2">
+                                                {% if product.is_sale %}
+                                                    <span class="badge bg-danger me-2">¡OFERTA!</span>
+                                                    <span class="fw-bold text-black">${{ product.sale_price }}</span>
+                                                    <small class="text-muted text-decoration-line-through ms-2">${{ product.price }}</small>
+                                                {% else %}
+                                                    <span class="fw-bold text-black">${{ product.price }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <small class="text-muted">
+                                                Cantidad: 
+                                                <span class="fw-bold text-black">
+                                                {% for key, value in quantities.items %}
+                                                    {% if key == product.id|stringformat:"s" %}
+                                                        {{ value }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                </span>
+                                            </small>
+                                        </div>
+                                        <div class="col-md-3 text-end">
+                                            {% if product.is_in_stock %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle"></i> Disponible
+                                                </span>
+                                                <br>
+                                                <small class="text-muted">({{ product.stock }} en stock)</small>
+                                            {% else %}
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times-circle"></i> Sin stock
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            
+                            <!-- Total -->
+                            <div class="border-top pt-3 mt-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="text-black mb-0">Total de la Reserva:</h5>
+                                    <h4 class="fw-bold text-black mb-0">${{ totals }}</h4>
+                                </div>
+                            </div>
+                            
+                            <!-- Botón para actualizar -->
+                            <div class="text-center mt-4">
+                                <a href="{% url 'cart_summary' %}" class="btn btn-outline-dark btn-lg px-4" style="border-radius: 25px;">
+                                    <i class="fas fa-edit me-2"></i>Modificar Artículos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            {% endfor %}
-            Total:  ${{ totals }}
-            <br/><br/>
-            <a href="{% url 'cart_summary' %}" class="btn btn-sm btn-outline-secondary">Actualizar artículos</a>
-          </div>
-        </div>
-<br/><br/>
-<div class="card">
-  <div class="card-header">
-    Información de Entrega
-  </div>
-  <div class="card-body">
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i>
-        <strong>Sistema de Reservas:</strong> Al confirmar, los productos serán apartados para ti y recibirás un email de confirmación. Nos pondremos en contacto contigo para coordinar la entrega.
-    </div>
-    <form method="POST" action="{% url 'billing_info' %}">
-        {% csrf_token %}
-    {{ shipping_form.as_p }}
-  </div>
-</div>
-<br/>
-
-<button type="submit" class="btn btn-success">
-        <i class="fas fa-bookmark"></i> Confirmar Reserva
-</button>
-
-</form>
-<br/><br/>
-
-
+                
+                <!-- Columna derecha - Información de entrega -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-lg h-100" style="border-radius: 20px;">
+                        <div class="card-header bg-white text-black text-center py-3" style="border: 2px solid #000; border-radius: 20px 20px 0 0;">
+                            <h4 class="mb-0">
+                                <i class="fas fa-truck me-2"></i>
+                                Información de Entrega
+                            </h4>
+                        </div>
+                        <div class="card-body p-4">
+                            
+                            <!-- Alerta informativa -->
+                            <div class="alert alert-dark border-2 border-black" style="border-radius: 15px; background: linear-gradient(45deg, #f8f9fa, #e9ecef);">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-info-circle text-black fa-lg me-3 mt-1"></i>
+                                    <div>
+                                        <h6 class="fw-bold text-black mb-2">Sistema de Reservas</h6>
+                                        <p class="mb-0 text-black">Al confirmar, los productos serán apartados para ti. Recibirás un email de confirmación y nos pondremos en contacto para coordinar la entrega.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Formulario -->
+                            <form method="POST" action="{% url 'billing_info' %}" class="mt-4">
+                                {% csrf_token %}
+                                
+                                <div class="form-floating-group mb-4">
+                                    {{ shipping_form.as_p }}
+                                </div>
+                                
+                                <!-- Selección de método de envío -->
+                                <div class="mb-4">
+                                    <h6 class="fw-bold text-black mb-3">
+                                        <i class="fas fa-shipping-fast me-2"></i>
+                                        Método de Envío
+                                    </h6>
+                                    <div class="shipping-options">
+                                        {{ shipping_method_form.shipping_method }}
+                                    </div>
+                                </div>
+                                
+                                <!-- Resumen de costos -->
+                                <div class="border rounded p-3 mb-4" style="background: linear-gradient(45deg, #f8f9fa, #ffffff);">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Subtotal de productos:</span>
+                                        <span class="fw-bold">${{ totals }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Costo de envío:</span>
+                                        <span id="shipping-cost" class="fw-bold">Selecciona método</span>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">Total final:</span>
+                                        <span id="total-final" class="fw-bold text-success fs-5">${{ totals }}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botón de confirmación -->
+                                <div class="d-grid mt-4">
+                                    <button type="submit" class="btn btn-black btn-lg py-3" style="background: #000; border: none; border-radius: 25px; transition: all 0.3s ease;">
+                                        <i class="fas fa-bookmark me-2"></i>
+                                        <span class="fw-bold">Confirmar Reserva</span>
+                                    </button>
+                                </div>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+                
             </div>
         </div>
     </div>
+</div>
 
+<!-- Estilos personalizados -->
+<style>
+.btn-black {
+    background: #000 !important;
+    color: #fff !important;
+}
 
+.btn-black:hover {
+    background: #333 !important;
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
 
+.product-item {
+    transition: all 0.3s ease;
+}
 
+.product-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
 
+.card {
+    transition: all 0.3s ease;
+}
+
+.form-floating-group .form-control,
+.form-floating-group .form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.form-floating-group .form-control:focus,
+.form-floating-group .form-select:focus {
+    border-color: #000;
+    box-shadow: 0 0 0 0.2rem rgba(0,0,0,0.1);
+}
+
+.form-floating-group label {
+    color: #000;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+</style>
+
+<!-- JavaScript para cálculo dinámico de envío -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const shippingOptions = document.querySelectorAll('input[name="shipping_method"]');
+    const shippingCostSpan = document.getElementById('shipping-cost');
+    const totalFinalSpan = document.getElementById('total-final');
+    const subtotal = {{ totals }};
+    
+    // Datos de métodos de envío (desde el backend)
+    const shippingMethods = {
+        {% for method in shipping_method_form.fields.shipping_method.queryset %}
+        {{ method.id }}: {
+            name: '{{ method.get_name_display }}',
+            baseCost: {{ method.base_cost }},
+            costPerKg: {{ method.cost_per_kg }},
+            freeThreshold: {{ method.free_shipping_threshold|default:"null" }},
+            estimatedDays: '{{ method.estimated_days }}'
+        },
+        {% endfor %}
+    };
+    
+    function updateShippingCost() {
+        const selectedOption = document.querySelector('input[name="shipping_method"]:checked');
+        
+        if (!selectedOption) {
+            shippingCostSpan.textContent = 'Selecciona método';
+            totalFinalSpan.textContent = `$${subtotal}`;
+            return;
+        }
+        
+        const methodId = parseInt(selectedOption.value);
+        const method = shippingMethods[methodId];
+        
+        let shippingCost = method.baseCost + (method.costPerKg * 1); // Asumimos 1kg promedio
+        
+        // Verificar si aplica envío gratis
+        if (method.freeThreshold && subtotal >= method.freeThreshold) {
+            shippingCost = 0;
+        }
+        
+        const total = subtotal + shippingCost;
+        
+        if (shippingCost === 0) {
+            shippingCostSpan.textContent = 'GRATIS';
+            shippingCostSpan.className = 'fw-bold text-success';
+        } else {
+            shippingCostSpan.textContent = `$${shippingCost}`;
+            shippingCostSpan.className = 'fw-bold';
+        }
+        
+        totalFinalSpan.textContent = `$${total}`;
+    }
+    
+    // Agregar listeners a los radio buttons
+    shippingOptions.forEach(option => {
+        option.addEventListener('change', updateShippingCost);
+    });
+    
+    // Actualizar al cargar si hay una opción seleccionada
+    updateShippingCost();
+});
+</script>
+
+<!-- Estilos para las opciones de envío -->
+<style>
+.shipping-options .form-check {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    background: linear-gradient(45deg, #ffffff, #f8f9fa);
+}
+
+.shipping-options .form-check:hover {
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,123,255,0.1);
+}
+
+.shipping-options .form-check-input:checked + .form-check-label {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.shipping-options .form-check-input:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.shipping-options .form-check-label {
+    font-size: 1.1rem;
+    margin-left: 10px;
+    cursor: pointer;
+}
+</style>
 
 {% endblock %}

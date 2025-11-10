@@ -2,6 +2,32 @@
 
 {% block content %}
 
+<style>
+.badge {
+    font-weight: 600 !important;
+}
+
+.badge.bg-success {
+    background-color: #28a745 !important;
+    color: #fff !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+    color: #fff !important;
+}
+</style>
+
 <div class="container my-5">
     <div class="row">
         <div class="col-12">
@@ -18,10 +44,10 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Información del Producto</h5>
                             <span class="badge 
-                                {% if reservation.status == 'confirmed' %}badge-success
-                                {% elif reservation.status == 'pending' %}badge-warning
-                                {% elif reservation.status == 'cancelled' %}badge-danger
-                                {% else %}badge-secondary{% endif %}">
+                                {% if reservation.status == 'confirmed' %}bg-success
+                                {% elif reservation.status == 'pending' %}bg-warning
+                                {% elif reservation.status == 'cancelled' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
                                 {{ reservation.get_status_display }}
                             </span>
                         </div>
@@ -54,9 +80,9 @@
                                             <td>
                                                 {{ reservation.product.stock }}
                                                 {% if reservation.product.is_available %}
-                                                    <span class="badge badge-success">Disponible</span>
+                                                    <span class="badge bg-success">Disponible</span>
                                                 {% else %}
-                                                    <span class="badge badge-danger">Agotado</span>
+                                                    <span class="badge bg-danger">Agotado</span>
                                                 {% endif %}
                                             </td>
                                         </tr>
@@ -82,10 +108,10 @@
                                     <td><strong>Estado:</strong></td>
                                     <td>
                                         <span class="badge 
-                                            {% if reservation.status == 'confirmed' %}badge-success
-                                            {% elif reservation.status == 'pending' %}badge-warning
-                                            {% elif reservation.status == 'cancelled' %}badge-danger
-                                            {% else %}badge-secondary{% endif %}">
+                                            {% if reservation.status == 'confirmed' %}bg-success
+                                            {% elif reservation.status == 'pending' %}bg-warning
+                                            {% elif reservation.status == 'cancelled' %}bg-danger
+                                            {% else %}bg-secondary{% endif %}">
                                             {{ reservation.get_status_display }}
                                         </span>
                                     </td>

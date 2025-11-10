@@ -12,6 +12,7 @@ urlpatterns = [
     path('update_info/', views.update_info, name='update_info'),
     path('product/<int:pk>', views.product, name='product'),
     path('product/<int:pk>/pagar/', views.pagar_producto, name='pagar_producto'),
+    path('category/', views.category_summary, name='category_redirect'),  # Redirección para /category/
     path('category/<str:foo>', views.category, name='category'),
     path('category/<str:parent_slug>/<str:subcategory_slug>/', views.subcategory, name='subcategory'),
     path('category_summary/', views.category_summary, name='category_summary'),

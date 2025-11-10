@@ -1,121 +1,42 @@
 {% extends 'base.html' %}
+{% load category_extras %}
 
 {% block content %}
 
-<!-- Estilos para imágenes uniformes y subcategorías -->
-<style>
-.card-img-container {
-    position: relative;
-    overflow: hidden;
-    background-color: #f8f9fa;
-}
-
-.card-img-top {
-    transition: transform 0.3s ease;
-}
-
-.card:hover .card-img-top {
-    transform: scale(1.05);
-}
-
-.card {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-}
-
-.card:hover {
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    transform: translateY(-5px);
-}
-
-.subcategories-section {
-    background: #f8f9fa;
-    padding: 2rem 0;
-    margin-bottom: 2rem;
-    border-radius: 15px;
-}
-
-.subcategory-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    text-decoration: none;
-    display: block;
-    color: inherit;
-}
-
-.subcategory-card:hover {
-    transform: translateY(-5px);
-    border-color: #667eea;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    color: inherit;
-    text-decoration: none;
-}
-
-.subcategory-icon {
-    font-size: 2.5rem;
-    color: #667eea;
-    margin-bottom: 1rem;
-}
-
-.subcategory-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-
-.subcategory-count {
-    color: #666;
-    font-size: 0.9rem;
-}
-</style>
-
 <!-- Header con imagen de armas -->
-<header class="hero-header" style="
-    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1595590424283-b8f17842773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2141&q=80');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    min-height: 35vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-">
+<header class="hero-header">
     <div class="container">
-        <div class="hero-content text-center">
-            <h1 class="hero-title" style="font-size: 3.5rem; font-weight: 900; text-shadow: 3px 3px 8px rgba(0,0,0,0.8); margin-bottom: 1rem; color: white;">
+        <div class="hero-content">
+            <h1 class="hero-title">
                 {{ category }}
             </h1>
-            <p class="hero-subtitle" style="font-size: 1.4rem; font-weight: 300; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); color: #f8f9fa;">
+            <p class="hero-subtitle">
                 Explora nuestra selección de {{ category|lower }}
-                    </p>
-                </div>
-            </div>
-        </header>
+            </p>
+        </div>
+    </div>
+</header>
 
         <!-- Subcategorías Section -->
         {% if subcategories %}
         <div class="container my-4">
             <div class="subcategories-section">
-                <h2 class="text-center mb-4">Subcategorías de {{ category }}</h2>
+                <h2 class="subcategories-title">Subcategorías de {{ category }}</h2>
                 <div class="row">
                     {% for subcategory in subcategories %}
-                    <div class="col-md-4 col-sm-6 mb-3">
-                        <a href="{% url 'subcategory' category.name|slugify subcategory.name|slugify %}" class="subcategory-card">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <a href="{% url 'subcategory' category.name|slugify subcategory.name|slugify %}" 
+                           class="subcategory-card" 
+                           data-type="{{ subcategory.name|subcategory_data_type }}">
                             <div class="subcategory-icon">
-                                <i class="fas fa-layer-group"></i>
+                                {{ subcategory.name|subcategory_icon }}
                             </div>
                             <h4 class="subcategory-title">{{ subcategory.name }}</h4>
-                            <p class="subcategory-count">
+                            <div class="subcategory-count">
                                 {% with subcategory.get_all_products.count as count %}
                                     {{ count }} producto{{ count|pluralize }}
                                 {% endwith %}
-                            </p>
+                            </div>
                         </a>
                     </div>
                     {% endfor %}

@@ -153,17 +153,20 @@ def category_summary(request):
 def category(request, foo):
 	# Replace Hyphens with Spaces
 	foo = foo.replace('-', ' ')
+	
 	# Grab the category from the url
 	try:
 		# Look Up The Category
-		category = Category.objects.get(name=foo)
+		category = Category.objects.get(name__iexact=foo)
 		products = category.get_all_products()  # Usar el nuevo método
 		
 		# Obtener subcategorías si es una categoría principal
 		subcategories = category.subcategories.filter(is_active=True) if category.is_parent else None
 		
 		# Verificar si es la categoría "Armas" que requiere verificación de edad
-		if category.name.lower() == 'armas':
+		category_name_lower = category.name.lower()
+		
+		if category_name_lower in ['armas', 'arma', 'firearms', 'weapons']:
 			return render(request, 'age_verification.html', {
 				'products': products, 
 				'category': category,
@@ -185,8 +188,8 @@ def subcategory(request, parent_slug, subcategory_slug):
 	subcategory_name = subcategory_slug.replace('-', ' ')
 	
 	try:
-		parent_category = Category.objects.get(name=parent_name, parent=None)
-		subcategory = Category.objects.get(name=subcategory_name, parent=parent_category)
+		parent_category = Category.objects.get(name__iexact=parent_name, parent=None)
+		subcategory = Category.objects.get(name__iexact=subcategory_name, parent=parent_category)
 		products = Product.objects.filter(category=subcategory)
 		
 		return render(request, 'subcategory.html', {

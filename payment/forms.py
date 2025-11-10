@@ -1,5 +1,5 @@
 from django import forms
-from .models import ShippingAddress
+from .models import ShippingAddress, ShippingMethod, ShippingMethod
 
 
 class ShippingForm(forms.ModelForm):
@@ -146,4 +146,33 @@ class PaymentForm(forms.Form):
         }),
         required=True
     )
+
+
+# Formulario para seleccionar método de envío
+class ShippingMethodForm(forms.Form):
+    shipping_method = forms.ModelChoiceField(
+        queryset=ShippingMethod.objects.filter(is_active=True),
+        label="Método de Envío",
+        widget=forms.RadioSelect,
+        required=True,
+        empty_label=None
+    )
+
+    def __init__(self, *args, **kwargs):
+        cart_total = kwargs.pop('cart_total', 0)
+        super().__init__(*args, **kwargs)
+
+        # Personalizar las opciones para mostrar costos
+        choices = []
+        for method in ShippingMethod.objects.filter(is_active=True):
+            cost = method.calculate_cost(cart_total)
+            if cost == 0:
+                cost_text = "GRATIS"
+            else:
+                cost_text = f"${cost}"
+
+            label = f"{method.get_name_display()} - {cost_text} ({method.estimated_days})"
+            choices.append((method.id, label))
+
+        self.fields['shipping_method'].choices = choices
 

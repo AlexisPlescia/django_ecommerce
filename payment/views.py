@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from cart.cart import Cart
-from payment.forms import ShippingForm, PaymentForm
+from payment.forms import ShippingForm, PaymentForm, ShippingMethodForm
 from payment.models import ShippingAddress, Order, OrderItem
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -98,8 +98,8 @@ def process_order(request):
 	if request.POST:
 		# Get the cart
 		cart = Cart(request)
-		cart_products = cart.get_prods
-		quantities = cart.get_quants
+		cart_products = cart.get_prods()
+		quantities = cart.get_quants()
 		totals = cart.cart_total()
 
 		# Get Billing Info from the last page
@@ -309,21 +309,36 @@ def billing_info(request):
 def checkout(request):
 	# Get the cart
 	cart = Cart(request)
-	cart_products = cart.get_prods
-	quantities = cart.get_quants
+	cart_products = cart.get_prods()
+	quantities = cart.get_quants()
 	totals = cart.cart_total()
+	
+	# Formulario de método de envío
+	shipping_method_form = ShippingMethodForm(cart_total=totals)
 
 	if request.user.is_authenticated:
 		# Checkout as logged in user
-		# Shipping User
-		shipping_user = ShippingAddress.objects.get(user__id=request.user.id)
+		# Shipping User - usar get_or_create para evitar errores si no existe
+		shipping_user, created = ShippingAddress.objects.get_or_create(user=request.user)
 		# Shipping Form
 		shipping_form = ShippingForm(request.POST or None, instance=shipping_user)
-		return render(request, "payment/checkout.html", {"cart_products":cart_products, "quantities":quantities, "totals":totals, "shipping_form":shipping_form })
+		return render(request, "payment/checkout.html", {
+			"cart_products": cart_products, 
+			"quantities": quantities, 
+			"totals": totals, 
+			"shipping_form": shipping_form,
+			"shipping_method_form": shipping_method_form
+		})
 	else:
 		# Checkout as guest
 		shipping_form = ShippingForm(request.POST or None)
-		return render(request, "payment/checkout.html", {"cart_products":cart_products, "quantities":quantities, "totals":totals, "shipping_form":shipping_form})
+		return render(request, "payment/checkout.html", {
+			"cart_products": cart_products, 
+			"quantities": quantities, 
+			"totals": totals, 
+			"shipping_form": shipping_form,
+			"shipping_method_form": shipping_method_form
+		})
 
 	
 

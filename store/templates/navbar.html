@@ -53,10 +53,9 @@
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{% url 'category_summary' %}">Todos los productos</a></li>
                                 <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" href="{% url 'category' 'Armas' %}">Armas</a></li> <!-- Cambiar por productos  -->
-                                <li><a class="dropdown-item" href="{% url 'category' 'Municiones' %}">Municiones</a></li> <!-- Cambiar por productos  -->
-                                <li><a class="dropdown-item" href="{% url 'category' 'Accesorios' %}">Accesorios</a></li> <!-- Cambiar por productos  -->
-                                <li><a class="dropdown-item" href="{% url 'category' 'Mantenimiento' %}">Mantenimiento</a></li> <!-- Cambiar por productos  -->
+                                {% for category in categories %}
+                                <li><a class="dropdown-item" href="{% url 'category' category.name %}">{{ category.name }}</a></li>
+                                {% endfor %}
                             </ul>
                         </li>
                     </ul>

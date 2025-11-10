@@ -39,10 +39,10 @@ class ProductImageAdmin(admin.ModelAdmin):
 # Registro personalizado para Reservation
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
-    list_display = ['id', 'product', 'customer_name', 'quantity', 'status', 'created_at', 'customer_notified', 'admin_notified']
-    list_filter = ['status', 'created_at', 'customer_notified', 'admin_notified']
+    list_display = ['id', 'product', 'customer_name', 'quantity', 'status', 'converted_to_order', 'created_at', 'customer_notified']
+    list_filter = ['status', 'converted_to_order', 'created_at', 'customer_notified', 'admin_notified']
     search_fields = ['customer_name', 'customer_email', 'product__name']
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['created_at', 'updated_at', 'converted_to_order']
     list_editable = ['status']
     
     fieldsets = (
@@ -56,7 +56,7 @@ class ReservationAdmin(admin.ModelAdmin):
             'fields': ('shipping_address',)
         }),
         ('Estado de la Reserva', {
-            'fields': ('status', 'expires_at')
+            'fields': ('status', 'expires_at', 'converted_to_order')
         }),
         ('Notificaciones', {
             'fields': ('customer_notified', 'admin_notified')
@@ -66,6 +66,12 @@ class ReservationAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    def get_readonly_fields(self, request, obj=None):
+        """Hace converted_to_order solo lectura después de la creación"""
+        if obj and obj.converted_to_order:
+            return self.readonly_fields + ['status']
+        return self.readonly_fields
 
 
 # Mix profile info and user info

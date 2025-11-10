@@ -1,5 +1,40 @@
 {% extends 'base.html' %}
 
+<!-- Estilos personalizados -->
+<style>
+.cart-card {
+    transition: all 0.3s ease;
+    border: 2px solid #f8f9fa;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+}
+
+.cart-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
+    border-color: #007bff;
+}
+
+.cart-card .card-img-top {
+    transition: transform 0.3s ease;
+}
+
+.cart-card:hover .card-img-top {
+    transform: scale(1.1);
+}
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.total-card {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 2px solid #dee2e6;
+}
+</style>
 
 {% block content %}
 
@@ -25,80 +60,92 @@
         <br/>
         <div class="container">
         {% if cart_products %}
+            <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-md-2 row-cols-xl-3 justify-content-center">
         	{% for product in cart_products %}
         	
-<div class="card mb-3">
-  <div class="row g-0">
-    <div class="col-md-4">
-      <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="...">
-    </div>
-    <div class="col-md-8">
-      <div class="card-body">
-        <center>
-        <h5 class="card-title">{{ product.name }}</h5>
-        <br/>
-        <p class="card-text justified">{{ product.description }}</p>
-        
-        {% if product.is_sale %}
-        <div class="d-flex justify-content-center small text-warning mb-2">
-                <div class="bi-star-fill"></div>
-                &nbsp;&nbsp;¡Vendido!&nbsp;&nbsp;
-                <div class="bi-star-fill"></div>
+                <div class="col mb-5">
+                    <div class="card cart-card h-100 shadow-sm" style="border-radius: 15px;">
+                        <!-- Imagen del producto -->
+                        <div style="height: 200px; overflow: hidden; border-radius: 15px 15px 0 0; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; padding: 10px;">
+                            <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}" 
+                                 style="max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.3s ease;" />
+                        </div>
+                        
+                        <!-- Contenido de la tarjeta -->
+                        <div class="card-body p-4 d-flex flex-column">
+                            <div class="text-center mb-3">
+                                <!-- Nombre del producto -->
+                                <h6 class="fw-bold mb-2">{{ product.name }}</h6>
+                                
+                                <!-- Precio -->
+                                {% if product.is_sale %}
+                                    <div class="d-flex justify-content-center small text-warning mb-2">
+                                        <i class="bi bi-star-fill"></i>
+                                        &nbsp;&nbsp;¡OFERTA!&nbsp;&nbsp;
+                                        <i class="bi bi-star-fill"></i>
+                                    </div>
+                                    <span class="text-muted text-decoration-line-through me-2">${{ product.price }}</span>
+                                    <span class="fw-bold text-danger">${{ product.sale_price }}</span>
+                                {% else %}
+                                    <span class="fw-bold">${{ product.price }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Selector de cantidad -->
+                            <div class="row align-items-center mb-3">
+                                <div class="col-5">
+                                    <label class="form-label mb-0"><small><strong>Cantidad:</strong></small></label>
+                                </div>
+                                <div class="col-7">
+                                    <select class="form-select form-select-sm" id="select{{product.id}}">
+                                        {% for key, value in quantities.items %}
+                                            {% if key == product.id|stringformat:"s" %}
+                                                {% for i in "12345" %}
+                                                    <option value="{{ i }}" {% if i == value %}selected{% endif %}>{{ i }}</option>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Botones de acción -->
+                            <div class="text-center mt-auto">
+                                <div class="btn-group-vertical d-grid gap-2">
+                                    <button type="button" data-index="{{product.id}}" class="btn btn-outline-primary btn-sm update-cart">
+                                        <i class="fas fa-sync-alt"></i> Actualizar
+                                    </button>
+                                    <button type="button" data-index="{{product.id}}" class="btn btn-outline-danger btn-sm delete-product">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <!-- Product price-->
-                <strike>
-                ${{ product.price }}
-                </strike>
-                &nbsp;
-                ${{ product.sale_price }}
-
-
-
-        {% else %}
-            ${{ product.price }}
-            
-        {% endif %}
-            <br/><br/>
-        <div class="row justify-content-center">
-    <div class="col-md-2">Quantity:</div>
-                <div class="col-md-2">
-                <select class="form-select form-select-sm" id="select{{product.id}}">
-                  
-            {% for key, value in quantities.items %}
-                {% if key == product.id|slugify %}
-            <option selected>{{ value }}</option>
-                {% endif %}
-            {% endfor %}
-                           
-
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                </select>
-                </div>
-            </div>
-            <br/><br/>
-        <a href="{% url 'home'%}" class="btn btn-secondary">Inicio</a>
-        <button type="button" data-index="{{product.id}}" class="btn btn-secondary update-cart">Actualizar</button>
-        <button type="button" data-index="{{product.id}}" class="btn btn-danger delete-product">Eliminar</button>
-        
-    </center>
-      </div>
-    </div>
-  </div>
-</div>
-
-
 
         	{% endfor %}
-            <div align="right">
-            <h3>Total: ${{ totals }}</h3>
-            <a href="{% url 'checkout' %}" class="btn btn-success">Finalizar Compra</a>
-
             </div>
+            
+            <!-- Total y botones principales -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-lg total-card" style="border-radius: 20px;">
+                        <div class="card-body p-4 text-center">
+                            <h3 class="fw-bold mb-3">Total: <span class="text-success">${{ totals }}</span></h3>
+                            <div class="d-flex justify-content-center gap-3">
+                                <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg px-4" style="border-radius: 25px;">
+                                    <i class="fas fa-arrow-left"></i> Seguir Comprando
+                                </a>
+                                <a href="{% url 'checkout' %}" class="btn btn-success btn-lg px-4" style="border-radius: 25px;">
+                                    <i class="fas fa-shopping-cart"></i> Finalizar Compra
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <br/><br/><br/>
         	{% else %}
         	Tu carrito está vacío...

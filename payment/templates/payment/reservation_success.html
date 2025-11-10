@@ -29,7 +29,7 @@
                                         <strong>Precio unitario:</strong> ${{ reservation.product.price }}<br>
                                         <strong>Subtotal:</strong> ${{ reservation.total_price }}<br>
                                         <strong>Estado:</strong> 
-                                        <span class="badge badge-success">{{ reservation.get_status_display }}</span><br>
+                                        <span class="badge bg-success" style="color: #fff !important;">{{ reservation.get_status_display }}</span><br>
                                         <strong>Fecha:</strong> {{ reservation.created_at|date:"d/m/Y H:i" }}
                                     </p>
                                 </div>

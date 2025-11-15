@@ -25,61 +25,19 @@ from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 
 def search(request):
-	# Determine if they filled out the form
-	if request.method == "POST":
-		search_term = request.POST.get('searched', '').strip()
-		
-		if search_term:
-			# Query The Products DB Model - buscar en nombre, descripción y categoría
-			# Hacer la búsqueda más flexible
-			search_words = search_term.lower().split()
-			
-			query = Q()
-			for word in search_words:
-				query |= (
-					Q(name__icontains=word) | 
-					Q(description__icontains=word) |
-					Q(category__name__icontains=word)
-				)
-			
-			searched_products = Product.objects.filter(query).distinct()
-			
-			# Si no encuentra nada, buscar términos relacionados
-			if not searched_products.exists():
-				related_terms = {
-					'arma': ['arma', 'rifle', 'pistola'],
-					'municion': ['municion', 'bala', 'cartucho'],
-					'accesorio': ['accesorio', 'mira', 'scope'],
-					'mantenimiento': ['mantenimiento', 'limpieza', 'aceite']
-				}
-				
-				for term, synonyms in related_terms.items():
-					if any(word in search_term.lower() for word in synonyms):
-						searched_products = Product.objects.filter(
-							Q(category__name__icontains=term)
-						).distinct()
-						if searched_products.exists():
-							break
-			
-			# Debug: contar productos
-			print(f"Búsqueda: '{search_term}', Productos encontrados: {searched_products.count()}")
-			
-			# Test for null
-			if not searched_products.exists():
-				messages.error(request, f"No se encontraron productos para '{search_term}'. Intenta con: 'arma', 'municion', 'accesorio' o 'mantenimiento'.")
-				return render(request, "search.html", {'search_term': search_term})
-			else:
-				messages.success(request, f"Se encontraron {searched_products.count()} productos para '{search_term}'.")
-				return render(request, "search.html", {
-					'searched': searched_products,
-					'search_term': search_term
-				})
-		else:
-			messages.error(request, "Por favor ingresa un término de búsqueda.")
-			return render(request, "search.html", {})
-	else:
-		return render(request, "search.html", {})	
-
+    query = request.GET.get('q', '').strip()
+    # Redirigir si la búsqueda coincide exactamente con una categoría (ignorando mayúsculas y espacios)
+    category = Category.objects.filter(name__iexact=query).first()
+    if category:
+        # Normalizar el nombre para la URL
+        url_name = category.name.replace(' ', '-')
+        return redirect(f'/category/{url_name}')
+    products = Product.objects.filter(name__icontains=query)
+    context = {
+        'query': query,
+        'products': products,
+    }
+    return render(request, 'search.html', context)
 
 def update_info(request):
 	if request.user.is_authenticated:
@@ -342,7 +300,7 @@ def pagar_producto(request, pk):
     if request.user.is_authenticated:
         from .models import Order, Profile, Customer
         try:
-            profile = Profile.objects.get(user=request.user)
+            profile = Profile.objects.get(user__id=request.user)
         except Profile.DoesNotExist:
             profile = None
         # Buscar o crear el Customer asociado al usuario

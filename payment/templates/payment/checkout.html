@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load math_filters %}
 
 {% block content %}
 
@@ -439,5 +440,53 @@ document.addEventListener('DOMContentLoaded', function() {
     cursor: pointer;
 }
 </style>
+
+<!-- Selector de método de envío unificado -->
+<div class="mb-3">
+    <label for="metodo-envio" class="form-label">Método de envío</label>
+    <select id="metodo-envio" class="form-select">
+        <option value="oca">OCA ($3000)</option>
+        <option value="andreani">Andreani ($3600)</option>
+        <option value="retiro">Retiro en sucursal (Sin costo)</option>
+    </select>
+</div>
+
+{% with total=0 %}
+    {% for product in products %}
+        {% for key, cantidad in quantities.items %}
+            {% if key|add:0 == product.id %}
+                {% with total=total|add:product.price|mul:cantidad %}
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <span class="fw-bold">Total reserva:</span>
+        <span id="total-reserva" class="fw-bold text-success fs-5">${{ total|floatformat:2 }}</span>
+    </div>
+{% endwith %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const envioSelect = document.getElementById('metodo-envio');
+        const totalReservaSpan = document.getElementById('total-reserva');
+        let totalProductos = parseFloat(totalReservaSpan.textContent.replace('$','').replace(',','.'));
+        function actualizarTotal() {
+            let costoEnvio = 0;
+            if (envioSelect.value === 'oca') {
+                costoEnvio = 3000;
+            } else if (envioSelect.value === 'andreani') {
+                costoEnvio = 3600;
+            } else {
+                costoEnvio = 0;
+            }
+            totalReservaSpan.textContent = `$${(totalProductos + costoEnvio).toFixed(2)}`;
+        }
+        if(envioSelect){
+            envioSelect.addEventListener('change', actualizarTotal);
+            actualizarTotal();
+        }
+    });
+</script>
 
 {% endblock %}

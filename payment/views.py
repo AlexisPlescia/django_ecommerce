@@ -322,7 +322,7 @@ def checkout(request):
 		shipping_user, created = ShippingAddress.objects.get_or_create(user=request.user)
 		# Shipping Form
 		shipping_form = ShippingForm(request.POST or None, instance=shipping_user)
-		return render(request, "payment/checkout.html", {
+		return render(request, "payment/", {
 			"cart_products": cart_products, 
 			"quantities": quantities, 
 			"totals": totals, 

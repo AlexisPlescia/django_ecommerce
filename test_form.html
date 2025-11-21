@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Shipping Form</title>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DOM loaded');
+        const radios = document.querySelectorAll('input[name="shipping_method"]');
+        console.log('📻 Radio buttons found:', radios.length);
+        
+        radios.forEach((radio, index) => {
+            console.log(`Radio ${index}: value=${radio.value}, name=${radio.name}`);
+            radio.addEventListener('change', function() {
+                console.log('🔄 Radio changed:', this.value);
+                const cost = this.value == '1' ? 3000 : (this.value == '2' ? 3600 : 2400);
+                document.getElementById('total').textContent = `Total: ${10000 + cost}`;
+            });
+        });
+    });
+    </script>
+</head>
+<body>
+    <h1>Test Shipping Method Form</h1>
+    <form>
+        <div class="shipping-options">
+            <div id="id_shipping_method" class="form-check-input"><div>
+    <label for="id_shipping_method_0"><input type="radio" name="shipping_method" value="1" class="form-check-input" required id="id_shipping_method_0">
+ OCA - $3000.00 (3-5 días hábiles)</label>
+
+</div><div>
+    <label for="id_shipping_method_1"><input type="radio" name="shipping_method" value="2" class="form-check-input" required id="id_shipping_method_1">
+ Andreani - $3600.00 (2-4 días hábiles)</label>
+
+</div><div>
+    <label for="id_shipping_method_2"><input type="radio" name="shipping_method" value="3" class="form-check-input" required id="id_shipping_method_2">
+ Correo Argentino - $2400.00 (4-7 días hábiles)</label>
+
+</div>
+</div>
+        </div>
+    </form>
+    <p id="total">Total: 10000</p>
+    
+    <h2>Debug Info:</h2>
+    <pre id="debug"></pre>
+    <script>
+        document.getElementById('debug').textContent = document.querySelector('.shipping-options').innerHTML;
+    </script>
+</body>
+</html>

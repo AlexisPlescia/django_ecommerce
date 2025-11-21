@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Shipping JavaScript</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Test de Métodos de Envío</h2>
+        
+        <!-- Simular el HTML que genera Django -->
+        <div class="mb-4">
+            <h6 class="fw-bold text-black mb-3">
+                <i class="fas fa-shipping-fast me-2"></i>
+                Método de Envío
+            </h6>
+            <div class="shipping-options">
+                <div>
+                    <label for="id_shipping_method_0">
+                        <input type="radio" name="shipping_method" value="1" class="form-check-input" id="id_shipping_method_0">
+                        OCA - $3000 (3-5 días hábiles)
+                    </label>
+                </div>
+                <div>
+                    <label for="id_shipping_method_1">
+                        <input type="radio" name="shipping_method" value="2" class="form-check-input" id="id_shipping_method_1">
+                        Andreani - $3600 (2-4 días hábiles)
+                    </label>
+                </div>
+                <div>
+                    <label for="id_shipping_method_2">
+                        <input type="radio" name="shipping_method" value="3" class="form-check-input" id="id_shipping_method_2">
+                        Correo Argentino - $2400 (4-7 días hábiles)
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resumen de costos -->
+        <div class="border rounded p-3 mb-4" style="background: linear-gradient(45deg, #f8f9fa, #ffffff);">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>Subtotal de productos:</span>
+                <span class="fw-bold">$28.999</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>Costo de envío:</span>
+                <span id="shipping-cost" class="fw-bold">Selecciona método</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold">Total final:</span>
+                <span id="total-final" class="fw-bold text-success fs-5">$28.999</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DEBUGGING: DOM loaded');
+        
+        const shippingOptions = document.querySelectorAll('input[name="shipping_method"]');
+        const shippingCostSpan = document.getElementById('shipping-cost');
+        const totalFinalSpan = document.getElementById('total-final');
+        const subtotal = 28999;
+        
+        console.log('🔍 DEBUGGING: shippingOptions found:', shippingOptions.length);
+        console.log('🔍 DEBUGGING: shippingCostSpan:', shippingCostSpan);
+        console.log('🔍 DEBUGGING: totalFinalSpan:', totalFinalSpan);
+        console.log('🔍 DEBUGGING: subtotal:', subtotal);
+        
+        // Datos de métodos de envío
+        const shippingMethods = {
+            1: {
+                name: 'OCA',
+                baseCost: 2500,
+                costPerKg: 500,
+                freeThreshold: 50000,
+                estimatedDays: '3-5 días hábiles'
+            },
+            2: {
+                name: 'Andreani',
+                baseCost: 3000,
+                costPerKg: 600,
+                freeThreshold: 60000,
+                estimatedDays: '2-4 días hábiles'
+            },
+            3: {
+                name: 'Correo Argentino',
+                baseCost: 2000,
+                costPerKg: 400,
+                freeThreshold: 45000,
+                estimatedDays: '4-7 días hábiles'
+            }
+        };
+        
+        console.log('🔍 DEBUGGING: shippingMethods:', shippingMethods);
+        
+        function updateShippingCost() {
+            console.log('🔄 DEBUGGING: updateShippingCost called');
+            const selectedOption = document.querySelector('input[name="shipping_method"]:checked');
+            console.log('🔄 DEBUGGING: selectedOption:', selectedOption);
+            
+            if (!selectedOption) {
+                console.log('⚠️ DEBUGGING: No option selected');
+                shippingCostSpan.textContent = 'Selecciona método';
+                totalFinalSpan.textContent = `$${subtotal.toLocaleString('es-AR')}`;
+                return;
+            }
+            
+            const methodId = parseInt(selectedOption.value);
+            const method = shippingMethods[methodId];
+            console.log('🔄 DEBUGGING: methodId:', methodId, 'method:', method);
+            
+            if (!method) {
+                console.log('❌ DEBUGGING: Method not found for ID:', methodId);
+                return;
+            }
+            
+            let shippingCost = method.baseCost + (method.costPerKg * 1);
+            console.log('🔄 DEBUGGING: calculated shippingCost:', shippingCost);
+            
+            // Verificar si aplica envío gratis
+            if (method.freeThreshold && subtotal >= method.freeThreshold) {
+                shippingCost = 0;
+                console.log('🔄 DEBUGGING: Free shipping applied!');
+            }
+            
+            const total = subtotal + shippingCost;
+            console.log('🔄 DEBUGGING: final total:', total);
+            
+            if (shippingCost === 0) {
+                shippingCostSpan.textContent = 'GRATIS';
+                shippingCostSpan.className = 'fw-bold text-success';
+            } else {
+                shippingCostSpan.textContent = `$${shippingCost.toLocaleString('es-AR')}`;
+                shippingCostSpan.className = 'fw-bold';
+            }
+            
+            totalFinalSpan.textContent = `$${total.toLocaleString('es-AR')}`;
+            console.log('✅ DEBUGGING: UI updated');
+        }
+        
+        // Agregar listeners a los radio buttons
+        console.log('🎯 DEBUGGING: Adding event listeners...');
+        shippingOptions.forEach((option, index) => {
+            console.log(`🎯 DEBUGGING: Adding listener to option ${index}, value: ${option.value}`);
+            option.addEventListener('change', function() {
+                console.log('🔥 DEBUGGING: Radio button changed, value:', this.value);
+                updateShippingCost();
+            });
+        });
+        
+        console.log('🔄 DEBUGGING: Calling initial updateShippingCost...');
+        // Actualizar al cargar
+        updateShippingCost();
+    });
+    </script>
+</body>
+</html>

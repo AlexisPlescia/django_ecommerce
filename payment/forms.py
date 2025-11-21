@@ -153,7 +153,9 @@ class ShippingMethodForm(forms.Form):
     shipping_method = forms.ModelChoiceField(
         queryset=ShippingMethod.objects.filter(is_active=True),
         label="Método de Envío",
-        widget=forms.RadioSelect,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-input'
+        }),
         required=True,
         empty_label=None
     )

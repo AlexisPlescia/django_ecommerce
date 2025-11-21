@@ -141,8 +141,8 @@
             <div class="row">
                 
                 <!-- Columna izquierda - Resumen de productos -->
-                <div class="col-lg-7 mb-4">
-                    <div class="card border-0 shadow-lg h-100" style="border-radius: 20px;">
+                <div class="col-lg-6 mb-4">
+                    <div class="card border-0 shadow-lg h-100 d-flex flex-column" style="border-radius: 20px;">
                         <div class="card-header bg-black text-white text-center py-3" style="border-radius: 20px 20px 0 0;">
                             <h4 class="mb-0">
                                 <i class="fas fa-shopping-bag me-2"></i>
@@ -204,8 +204,29 @@
                             <!-- Total -->
                             <div class="border-top pt-3 mt-4">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="text-black mb-0">Total de la Reserva:</h5>
+                                    <h5 class="text-black mb-0">Subtotal de productos:</h5>
                                     <h4 class="fw-bold text-black mb-0">${{ totals }}</h4>
+                                </div>
+                            </div>
+
+                            <!-- Resumen de costos completo -->
+                            <div class="border rounded p-3 mb-4 mt-3" style="background: linear-gradient(45deg, #f8f9fa, #ffffff);">
+                                <h6 class="fw-bold text-black mb-3">
+                                    <i class="fas fa-calculator me-2"></i>
+                                    Resumen de Costos
+                                </h6>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Subtotal de productos:</span>
+                                    <span class="fw-bold">${{ totals }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span>Costo de envío:</span>
+                                    <span id="shipping-cost" class="fw-bold">Selecciona método</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Total final:</span>
+                                    <span id="total-final" class="fw-bold text-success fs-5">${{ totals }}</span>
                                 </div>
                             </div>
                             
@@ -220,8 +241,8 @@
                 </div>
                 
                 <!-- Columna derecha - Información de entrega -->
-                <div class="col-lg-5">
-                    <div class="card border-0 shadow-lg h-100" style="border-radius: 20px;">
+                <div class="col-lg-6 mb-4">
+                    <div class="card border-0 shadow-lg h-100 d-flex flex-column" style="border-radius: 20px;">
                         <div class="card-header bg-white text-black text-center py-3" style="border: 2px solid #000; border-radius: 20px 20px 0 0;">
                             <h4 class="mb-0">
                                 <i class="fas fa-truck me-2"></i>
@@ -250,7 +271,7 @@
                                 </div>
                                 
                                 <!-- Selección de método de envío -->
-                                <div class="mb-4">
+                                <div class="mb-4 shipping-section">
                                     <h6 class="fw-bold text-black mb-3">
                                         <i class="fas fa-shipping-fast me-2"></i>
                                         Método de Envío
@@ -260,21 +281,9 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Resumen de costos -->
-                                <div class="border rounded p-3 mb-4" style="background: linear-gradient(45deg, #f8f9fa, #ffffff);">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span>Subtotal de productos:</span>
-                                        <span class="fw-bold">${{ totals }}</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span>Costo de envío:</span>
-                                        <span id="shipping-cost" class="fw-bold">Selecciona método</span>
-                                    </div>
-                                    <hr>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="fw-bold">Total final:</span>
-                                        <span id="total-final" class="fw-bold text-success fs-5">${{ totals }}</span>
-                                    </div>
+                                <!-- Separador visual simple -->
+                                <div style="height: 40px; clear: both; margin: 30px 0;">
+                                    <hr style="border: 1px solid #dee2e6;">
                                 </div>
                                 
                                 <!-- Botón de confirmación -->
@@ -347,61 +356,118 @@
 <!-- JavaScript para cálculo dinámico de envío -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // console.log('🚀 DEBUGGING: DOM loaded');
+    
     const shippingOptions = document.querySelectorAll('input[name="shipping_method"]');
     const shippingCostSpan = document.getElementById('shipping-cost');
     const totalFinalSpan = document.getElementById('total-final');
-    const subtotal = {{ totals }};
+    const subtotal = {{ totals|floatformat:"0" }};
+    
+    // console.log('🔍 DEBUGGING: shippingOptions found:', shippingOptions.length);
+    // console.log('🔍 DEBUGGING: shippingCostSpan:', shippingCostSpan);
+    // console.log('🔍 DEBUGGING: totalFinalSpan:', totalFinalSpan);
+    // console.log('🔍 DEBUGGING: subtotal:', subtotal);
     
     // Datos de métodos de envío (desde el backend)
     const shippingMethods = {
         {% for method in shipping_method_form.fields.shipping_method.queryset %}
         {{ method.id }}: {
             name: '{{ method.get_name_display }}',
-            baseCost: {{ method.base_cost }},
-            costPerKg: {{ method.cost_per_kg }},
-            freeThreshold: {{ method.free_shipping_threshold|default:"null" }},
+            baseCost: {{ method.base_cost|floatformat:"0" }},
+            costPerKg: {{ method.cost_per_kg|floatformat:"0" }},
+            freeThreshold: {% if method.free_shipping_threshold %}{{ method.free_shipping_threshold|floatformat:"0" }}{% else %}null{% endif %},
             estimatedDays: '{{ method.estimated_days }}'
-        },
+        }{% if not forloop.last %},{% endif %}
         {% endfor %}
     };
     
+    // console.log('🔍 DEBUGGING: shippingMethods:', shippingMethods);
+    
     function updateShippingCost() {
+        // console.log('🔄 DEBUGGING: updateShippingCost called');
         const selectedOption = document.querySelector('input[name="shipping_method"]:checked');
+        // console.log('🔄 DEBUGGING: selectedOption:', selectedOption);
         
         if (!selectedOption) {
+            // console.log('⚠️ DEBUGGING: No option selected');
             shippingCostSpan.textContent = 'Selecciona método';
-            totalFinalSpan.textContent = `$${subtotal}`;
+            totalFinalSpan.textContent = `$${subtotal.toLocaleString('es-AR')}`;
             return;
         }
         
         const methodId = parseInt(selectedOption.value);
         const method = shippingMethods[methodId];
+        // console.log('🔄 DEBUGGING: methodId:', methodId, 'method:', method);
+        
+        if (!method) {
+            console.log('❌ DEBUGGING: Method not found for ID:', methodId);
+            return;
+        }
         
         let shippingCost = method.baseCost + (method.costPerKg * 1); // Asumimos 1kg promedio
+        // console.log('🔄 DEBUGGING: calculated shippingCost:', shippingCost);
         
         // Verificar si aplica envío gratis
         if (method.freeThreshold && subtotal >= method.freeThreshold) {
             shippingCost = 0;
+            // console.log('🔄 DEBUGGING: Free shipping applied!');
         }
         
         const total = subtotal + shippingCost;
+        // console.log('🔄 DEBUGGING: final total:', total);
         
         if (shippingCost === 0) {
             shippingCostSpan.textContent = 'GRATIS';
             shippingCostSpan.className = 'fw-bold text-success';
         } else {
-            shippingCostSpan.textContent = `$${shippingCost}`;
+            shippingCostSpan.textContent = `$${shippingCost.toLocaleString('es-AR')}`;
             shippingCostSpan.className = 'fw-bold';
         }
         
-        totalFinalSpan.textContent = `$${total}`;
+        totalFinalSpan.textContent = `$${total.toLocaleString('es-AR')}`;
+        // console.log('✅ DEBUGGING: UI updated');
     }
     
     // Agregar listeners a los radio buttons
-    shippingOptions.forEach(option => {
-        option.addEventListener('change', updateShippingCost);
+    // console.log('🎯 DEBUGGING: Adding event listeners...');
+    shippingOptions.forEach((option, index) => {
+        // console.log(`🎯 DEBUGGING: Adding listener to option ${index}, value: ${option.value}`);
+        option.addEventListener('change', function() {
+            // console.log('🔥 DEBUGGING: Radio button changed, value:', this.value);
+            
+            // Actualizar todos los estilos
+            document.querySelectorAll('.shipping-options input[type="radio"]').forEach(radio => {
+                const parentDiv = radio.closest('div');
+                const label = radio.nextElementSibling;
+                
+                if (radio.checked) {
+                    if (parentDiv) {
+                        parentDiv.style.borderColor = '#007bff';
+                        parentDiv.style.background = 'linear-gradient(45deg, #e7f3ff, #f0f8ff)';
+                        parentDiv.style.boxShadow = '0 4px 12px rgba(0,123,255,0.2)';
+                    }
+                    if (label) {
+                        label.style.color = '#007bff';
+                        label.style.fontWeight = '600';
+                    }
+                } else {
+                    if (parentDiv) {
+                        parentDiv.style.borderColor = '#e9ecef';
+                        parentDiv.style.background = 'linear-gradient(45deg, #ffffff, #f8f9fa)';
+                        parentDiv.style.boxShadow = 'none';
+                    }
+                    if (label) {
+                        label.style.color = '#333';
+                        label.style.fontWeight = '500';
+                    }
+                }
+            });
+            
+            updateShippingCost();
+        });
     });
     
+    // console.log('🔄 DEBUGGING: Calling initial updateShippingCost...');
     // Actualizar al cargar si hay una opción seleccionada
     updateShippingCost();
 });
@@ -409,84 +475,115 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Estilos para las opciones de envío -->
 <style>
-.shipping-options .form-check {
+/* Contenedor principal de métodos de envío */
+.shipping-options {
+    display: block;
+    position: static;
+    width: 100%;
+    margin: 0 0 20px 0;
+    padding: 0;
+    clear: both;
+}
+
+/* Resetear el contenedor generado por Django */
+.shipping-options > div[id^="id_shipping_method"] {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    clear: both !important;
+}
+
+/* Cada opción de envío */
+.shipping-options > div[id^="id_shipping_method"] > div {
     border: 2px solid #e9ecef;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-    background: linear-gradient(45deg, #ffffff, #f8f9fa);
-}
-
-.shipping-options .form-check:hover {
-    border-color: #007bff;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,123,255,0.1);
-}
-
-.shipping-options .form-check-input:checked + .form-check-label {
-    color: #007bff;
-    font-weight: bold;
-}
-
-.shipping-options .form-check-input:checked {
-    background-color: #007bff;
-    border-color: #007bff;
-}
-
-.shipping-options .form-check-label {
-    font-size: 1.1rem;
-    margin-left: 10px;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+    background: #ffffff;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    position: static;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 60px;
+    clear: both;
+}
+
+/* Hover effect */
+.shipping-options > div[id^="id_shipping_method"] > div:hover {
+    border-color: #007bff;
+    background: #f8f9ff;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.1);
+}
+
+/* Radio button styling */
+.shipping-options input[type="radio"] {
+    margin-right: 12px;
+    margin-left: 0;
+    width: 18px;
+    height: 18px;
+    accent-color: #007bff;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Label styling */
+.shipping-options label {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #333;
+    line-height: 1.4;
+    flex-grow: 1;
+}
+
+/* Selected state */
+.shipping-options input:checked + label {
+    color: #007bff;
+    font-weight: 600;
+}
+
+/* Asegurar separación del resumen de costos */
+.cost-summary {
+    margin-top: 25px !important;
+    clear: both !important;
+    position: static !important;
+    z-index: 1 !important;
+    display: block !important;
+}
+
+.shipping-options + .cost-summary {
+    margin-top: 30px !important;
+}
+
+/* Asegurar que no hay elementos flotantes o absolutos */
+.shipping-options * {
+    position: static !important;
+    float: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .shipping-options > div[id^="id_shipping_method"] > div {
+        padding: 14px 16px;
+        min-height: 55px;
+    }
+    
+    .shipping-options label {
+        font-size: 0.95rem;
+    }
 }
 </style>
-
-<!-- Selector de método de envío unificado -->
-<div class="mb-3">
-    <label for="metodo-envio" class="form-label">Método de envío</label>
-    <select id="metodo-envio" class="form-select">
-        <option value="oca">OCA ($3000)</option>
-        <option value="andreani">Andreani ($3600)</option>
-        <option value="retiro">Retiro en sucursal (Sin costo)</option>
-    </select>
-</div>
-
-{% with total=0 %}
-    {% for product in products %}
-        {% for key, cantidad in quantities.items %}
-            {% if key|add:0 == product.id %}
-                {% with total=total|add:product.price|mul:cantidad %}
-                {% endwith %}
-            {% endif %}
-        {% endfor %}
-    {% endfor %}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <span class="fw-bold">Total reserva:</span>
-        <span id="total-reserva" class="fw-bold text-success fs-5">${{ total|floatformat:2 }}</span>
-    </div>
-{% endwith %}
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const envioSelect = document.getElementById('metodo-envio');
-        const totalReservaSpan = document.getElementById('total-reserva');
-        let totalProductos = parseFloat(totalReservaSpan.textContent.replace('$','').replace(',','.'));
-        function actualizarTotal() {
-            let costoEnvio = 0;
-            if (envioSelect.value === 'oca') {
-                costoEnvio = 3000;
-            } else if (envioSelect.value === 'andreani') {
-                costoEnvio = 3600;
-            } else {
-                costoEnvio = 0;
-            }
-            totalReservaSpan.textContent = `$${(totalProductos + costoEnvio).toFixed(2)}`;
-        }
-        if(envioSelect){
-            envioSelect.addEventListener('change', actualizarTotal);
-            actualizarTotal();
-        }
-    });
-</script>
 
 {% endblock %}

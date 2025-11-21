@@ -8,7 +8,7 @@ import django
 import sys
 
 # Add the project directory to the Python path
-sys.path.append('/Users/alexisplescia/Desktop/backup_sniper_octubre_21/Django-Ecommerce')
+sys.path.append('/Users/alexisplescia/Desktop/git_app_sniper/django_ecommerce')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ecom.settings')
 django.setup()
 

@@ -156,10 +156,10 @@
                     
                     <div class="product-price">
                         {% if product.is_sale %}
-                            <span class="product-price-old">${{ product.price }}</span>
-                            ${{ product.sale_price }}
+                            <span class="product-price-old">${{ product.price|floatformat:"0" }}</span>
+                            ${{ product.sale_price|floatformat:"0" }}
                         {% else %}
-                            ${{ product.price }}
+                            ${{ product.price|floatformat:"0" }}
                         {% endif %}
                     </div>
                     

@@ -137,10 +137,10 @@
 
                         <!-- Product price-->
                         {% if product.is_sale %}
-                            <strike class="text-muted">${{ product.price }}</strike>
-                            <span class="text-success fw-bold">${{ product.sale_price }}</span>
+                            <strike class="text-muted">${{ product.price|floatformat:"0" }}</strike>
+                            <span class="text-success fw-bold">${{ product.sale_price|floatformat:"0" }}</span>
                         {% else %}
-                            <span class="fw-bold">${{ product.price }}</span>
+                            <span class="fw-bold">${{ product.price|floatformat:"0" }}</span>
                         {% endif %}
                     </div>
                 </div>

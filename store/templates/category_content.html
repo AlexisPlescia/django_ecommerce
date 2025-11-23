@@ -101,9 +101,9 @@
                                 </div>
 
                                 <!-- Product price-->
-                                <span class="text-muted text-decoration-line-through">${{ product.price }}</span>
+                                <span class="text-muted text-decoration-line-through">${{ product.price|floatformat:"0" }}</span>
                                 <br>
-                                <span class="text-success fw-bold">${{ product.sale_price }}</span>
+                                <span class="text-success fw-bold">${{ product.sale_price|floatformat:"0" }}</span>
                             </div>
                         </div>
                         <!-- Product actions-->
@@ -151,7 +151,7 @@
                                 </div>
 
                                 <!-- Product price-->
-                                <span class="text-dark fw-bold">${{ product.price }}</span>
+                                <span class="text-dark fw-bold">${{ product.price|floatformat:"0" }}</span>
                             </div>
                         </div>
                         <!-- Product actions-->

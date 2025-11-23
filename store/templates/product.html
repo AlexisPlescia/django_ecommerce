@@ -299,14 +299,14 @@
                         {% if product.is_sale %}
                             <div>
                                 <span class="text-decoration-line-through opacity-75 me-3">
-                                    ${{ product.price }}
+                                    ${{ product.price|floatformat:"0" }}
                                 </span>
                                 <span class="fw-bold">
-                                    ${{ product.sale_price }}
+                                    ${{ product.sale_price|floatformat:"0" }}
                                 </span>
                             </div>
                         {% else %}
-                            <span class="fw-bold">${{ product.price }}</span>
+                            <span class="fw-bold">${{ product.price|floatformat:"0" }}</span>
                         {% endif %}
                     </div>
                     

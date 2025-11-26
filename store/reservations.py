@@ -108,7 +108,7 @@ def create_reservation(request):
         return redirect('home')
 
 
-def send_reservation_emails(reservations, shipping_info):
+def send_reservation_emails(reservations, shipping_info, extra_context=None):
     """
     Envía correos de confirmación al cliente y notificación al admin
     """
@@ -117,15 +117,22 @@ def send_reservation_emails(reservations, shipping_info):
     
     # Email al cliente
     try:
-        subject_customer = 'Confirmación de Reserva - Tu pedido ha sido procesado'
+        subject_customer = 'Confirmación de Reserva y Pedido - Tu orden ha sido procesada'
         
-        # Renderizar template HTML para el cliente
-        html_content_customer = render_to_string('emails/reservation_confirmation.html', {
+        # Crear contexto para el template
+        context = {
             'customer_name': customer_name,
             'reservations': reservations,
             'total_amount': sum(r.total_price for r in reservations),
             'shipping_address': reservations[0].shipping_address if reservations else '',
-        })
+        }
+        
+        # Agregar contexto extra si está disponible
+        if extra_context:
+            context.update(extra_context)
+        
+        # Renderizar template HTML para el cliente
+        html_content_customer = render_to_string('emails/reservation_confirmation.html', context)
         
         text_content_customer = strip_tags(html_content_customer)
         

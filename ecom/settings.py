@@ -155,12 +155,17 @@ MERCADOPAGO_ACCESS_TOKEN = 'APP_USR-1489230634829663-042812-15c53ea0d2ffc1450a7b
 MERCADOPAGO_PUBLIC_KEY = 'APP_USR-2d14c31c-e478-4ef1-b5f9-4468c4e8c645'
 
 # Configuración de email para envío automático
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Cambia esto por tu servidor SMTP
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'alexisplescia@gmail.com'  # Cambia esto por tu email
-EMAIL_HOST_PASSWORD = 'tu-contraseña'       # Cambia esto por tu contraseña
+# Para desarrollo - imprimir emails en consola
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Para producción - usar SMTP real (descomenta cuando tengas las credenciales)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'  # Cambia esto por tu servidor SMTP
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'alexisplescia@gmail.com'  # Cambia esto por tu email
+# EMAIL_HOST_PASSWORD = 'tu-contraseña'       # Cambia esto por tu contraseña
+DEFAULT_FROM_EMAIL = 'Sniper Ecommerce <alexisplescia@gmail.com>'  # Email remitente por defecto
 
 # Configuración de Jazzmin
 JAZZMIN_SETTINGS = {
@@ -246,4 +251,3 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success"
     }
 }
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

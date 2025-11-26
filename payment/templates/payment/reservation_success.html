@@ -7,14 +7,47 @@
         <div class="col-md-8">
             <div class="card shadow">
                 <div class="card-header bg-success text-white text-center">
-                    <h2><i class="fas fa-check-circle"></i> ¡Reserva Confirmada!</h2>
+                    <h2><i class="fas fa-check-circle"></i> ¡Reserva y Pedido Confirmados!</h2>
                 </div>
                 <div class="card-body">
                     <div class="alert alert-success text-center" role="alert">
                         <h4>¡Excelente!</h4>
-                        <p>Tu reserva ha sido procesada exitosamente.</p>
+                        <p>Tu reserva y pedido han sido procesados exitosamente.</p>
+                        {% if order %}
+                        <p><strong>Número de Pedido: #{{ order.id }}</strong></p>
+                        <p><strong>Total con envío: ${{ total_with_shipping|floatformat:"0" }}</strong></p>
+                        {% endif %}
                         <p><strong>Total de productos reservados: {{ total_reservations }}</strong></p>
                     </div>
+                    
+                    {% if order %}
+                    <!-- Información del Pedido -->
+                    <div class="card mb-4 border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h5><i class="fas fa-box"></i> Información del Pedido #{{ order.id }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Cliente:</strong> {{ order.full_name }}</p>
+                                    <p><strong>Email:</strong> {{ order.email }}</p>
+                                    <p><strong>Fecha del pedido:</strong> {{ order.date_ordered|date:"d/m/Y H:i" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Subtotal:</strong> ${{ order.amount_paid|add:"-"|add:order.shipping_cost|floatformat:"0" }}</p>
+                                    {% if shipping_method %}
+                                    <p><strong>Método de envío:</strong> {{ shipping_method.get_name_display }}</p>
+                                    <p><strong>Costo de envío:</strong> ${{ shipping_cost|floatformat:"0" }}</p>
+                                    {% endif %}
+                                    <p><strong>Total final:</strong> ${{ order.amount_paid|floatformat:"0" }}</p>
+                                    <p><strong>Estado:</strong> 
+                                        <span class="badge bg-warning text-dark">Pendiente de envío</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                     
                     <h4>Detalles de tu reserva:</h4>
                     
@@ -26,8 +59,8 @@
                                     <h5 class="card-title">{{ reservation.product.name }}</h5>
                                     <p class="card-text">
                                         <strong>Cantidad:</strong> {{ reservation.quantity }}<br>
-                                        <strong>Precio unitario:</strong> ${{ reservation.product.price }}<br>
-                                        <strong>Subtotal:</strong> ${{ reservation.total_price }}<br>
+                                        <strong>Precio unitario:</strong> ${{ reservation.product.price|floatformat:"0" }}<br>
+                                        <strong>Subtotal:</strong> ${{ reservation.total_price|floatformat:"0" }}<br>
                                         <strong>Estado:</strong> 
                                         <span class="badge bg-success" style="color: #fff !important;">{{ reservation.get_status_display }}</span><br>
                                         <strong>Fecha:</strong> {{ reservation.created_at|date:"d/m/Y H:i" }}
@@ -48,6 +81,14 @@
                         <ul class="mb-0">
                             <li>Hemos enviado un correo de confirmación a tu email</li>
                             <li>Los productos han sido apartados para ti</li>
+                            {% if order %}
+                            <li><strong>Tu pedido #{{ order.id }}</strong> ha sido registrado en nuestro sistema</li>
+                            <li>Puedes rastrear el estado de tu pedido en el panel de administración</li>
+                            {% endif %}
+                            <li>Te contactaremos pronto para coordinar la entrega</li>
+                            <li>Las reservas tienen una validez de 24 horas</li>
+                        </ul>
+                    </div>
                             <li>Nos pondremos en contacto contigo pronto para coordinar la entrega</li>
                             <li>Puedes consultar el estado de tus reservas en cualquier momento</li>
                         </ul>

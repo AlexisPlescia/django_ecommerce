@@ -15,9 +15,9 @@
         <!-- Font Awesome icons-->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
         <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+            <link href="{% static 'css/styles.css' %}?v={{ request.META.REQUEST_TIME|default:'1' }}" rel="stylesheet" />
         <!-- Headers unificados CSS -->
-        <link href="{% static 'css/headers.css' %}" rel="stylesheet" />
+        <link href="{% static 'css/headers.css' %}?v={{ request.META.REQUEST_TIME|default:'1' }}" rel="stylesheet" />
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         
         <!-- Estilos globales -->

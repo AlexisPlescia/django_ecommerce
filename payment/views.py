@@ -216,6 +216,7 @@ def billing_info(request):
 
         # Importar modelos necesarios
         from store.models import Reservation
+        from store.reservations import send_reservation_emails  # 🆕 Importar función de emails
         from datetime import timedelta
         from django.core.mail import send_mail, EmailMultiAlternatives
         from django.template.loader import render_to_string
@@ -238,6 +239,22 @@ def billing_info(request):
         # Crear reservas para cada producto
         reservations_created = []
         try:
+            # Obtener método de envío
+            shipping_method_id = my_shipping.get('shipping_method')
+            from payment.models import ShippingMethod
+            shipping_method = None
+            shipping_cost = 0
+            
+            if shipping_method_id:
+                try:
+                    shipping_method = ShippingMethod.objects.get(id=shipping_method_id)
+                    shipping_cost = shipping_method.calculate_cost(totals)
+                except ShippingMethod.DoesNotExist:
+                    pass
+            
+            # Calcular total con envío
+            total_with_shipping = totals + shipping_cost
+            
             for product in cart_products:
                 quantity = quantities.get(str(product.id), 0)
                 
@@ -270,6 +287,42 @@ def billing_info(request):
                     messages.error(request, f"Error al reservar {product.name}")
                     return redirect('cart_summary')
             
+            # 🆕 CREAR TAMBIÉN UNA ORDEN (PEDIDO)
+            if reservations_created:
+                # Crear la orden principal
+                order = Order.objects.create(
+                    user=request.user if request.user.is_authenticated else None,
+                    full_name=my_shipping['shipping_full_name'],
+                    email=my_shipping['shipping_email'],
+                    shipping_address=f"{my_shipping['shipping_address1']}\n{my_shipping['shipping_city']}\n{my_shipping.get('shipping_state', '')}\n{my_shipping.get('shipping_zipcode', '')}",
+                    amount_paid=total_with_shipping,
+                    shipping_method=shipping_method,
+                    shipping_cost=shipping_cost,
+                    total_with_shipping=total_with_shipping,
+                    shipped=False,
+                    # Vincular con la primera reserva (o podrías crear una lógica diferente)
+                    reservation=reservations_created[0] if reservations_created else None
+                )
+                
+                # Crear los items de la orden
+                for product in cart_products:
+                    quantity = quantities.get(str(product.id), 0)
+                    
+                    # Calcular precio unitario
+                    if product.is_sale:
+                        unit_price = product.sale_price
+                    else:
+                        unit_price = product.price
+                    
+                    # Crear el OrderItem
+                    OrderItem.objects.create(
+                        order=order,
+                        product=product,
+                        user=request.user if request.user.is_authenticated else None,
+                        quantity=quantity,
+                        price=unit_price
+                    )
+            
             # Limpiar el carrito
             for key in list(request.session.keys()):
                 if key == "session_key":
@@ -282,12 +335,36 @@ def billing_info(request):
                 except:
                     pass
             
+            # 🆕 ENVIAR EMAILS DE CONFIRMACIÓN
+            if reservations_created:
+                try:
+                    # Crear un diccionario con información adicional del pedido
+                    email_context = {
+                        'order': order if 'order' in locals() else None,
+                        'shipping_method': shipping_method,
+                        'shipping_cost': shipping_cost,
+                        'total_with_shipping': total_with_shipping if 'total_with_shipping' in locals() else totals,
+                    }
+                    send_reservation_emails(reservations_created, my_shipping, email_context)
+                    print(f"✅ Email enviado a {my_shipping['shipping_email']}")
+                except Exception as e:
+                    print(f"❌ Error enviando email: {e}")
+                    # No fallar el proceso completo si falla el email
+                    pass
+            
             # Mensaje de éxito
-            messages.success(request, f"¡Reserva confirmada! Se crearon {len(reservations_created)} reservas exitosamente.")
+            if 'order' in locals():
+                messages.success(request, f"¡Pedido #{order.id} confirmado! Se crearon {len(reservations_created)} reservas y 1 orden exitosamente. Se envió un email de confirmación.")
+            else:
+                messages.success(request, f"¡Reserva confirmada! Se crearon {len(reservations_created)} reservas exitosamente. Se envió un email de confirmación.")
             
             return render(request, 'payment/reservation_success.html', {
                 'reservations': reservations_created,
-                'total_reservations': len(reservations_created)
+                'total_reservations': len(reservations_created),
+                'order': order if 'order' in locals() else None,
+                'shipping_method': shipping_method,
+                'shipping_cost': shipping_cost,
+                'total_with_shipping': total_with_shipping if 'total_with_shipping' in locals() else totals,
             })
             
         except Exception as e:

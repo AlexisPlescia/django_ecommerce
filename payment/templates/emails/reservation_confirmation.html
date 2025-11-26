@@ -49,21 +49,34 @@
 </head>
 <body>
     <div class="header">
-        <h1>¡Reserva Confirmada!</h1>
+        <h1>¡Reserva y Pedido Confirmados!</h1>
     </div>
     
     <div class="content">
         <h2>Hola {{ customer_name }},</h2>
         
-        <p>Tu reserva ha sido confirmada exitosamente. A continuación encontrarás los detalles:</p>
+        <p>Tu reserva y pedido han sido confirmados exitosamente. A continuación encontrarás los detalles:</p>
+        
+        {% if order %}
+        <div style="background-color: #e3f2fd; border: 1px solid #2196f3; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3>📦 Información del Pedido #{{ order.id }}</h3>
+            <p><strong>Fecha del pedido:</strong> {{ order.date_ordered|date:"d/m/Y H:i" }}</p>
+            <p><strong>Estado:</strong> Confirmado - Pendiente de envío</p>
+            {% if shipping_method %}
+            <p><strong>Método de envío:</strong> {{ shipping_method.get_name_display }}</p>
+            <p><strong>Costo de envío:</strong> ${{ shipping_cost|floatformat:"0" }}</p>
+            {% endif %}
+            <p><strong>Total con envío:</strong> ${{ total_with_shipping|floatformat:"0" }}</p>
+        </div>
+        {% endif %}
         
         <h3>Productos Reservados:</h3>
         {% for reservation in reservations %}
         <div class="reservation-item">
             <h4>{{ reservation.product.name }}</h4>
             <p><strong>Cantidad:</strong> {{ reservation.quantity }}</p>
-            <p><strong>Precio unitario:</strong> ${{ reservation.product.price }}</p>
-            <p><strong>Subtotal:</strong> ${{ reservation.total_price }}</p>
+            <p><strong>Precio unitario:</strong> ${{ reservation.product.price|floatformat:"0" }}</p>
+            <p><strong>Subtotal:</strong> ${{ reservation.total_price|floatformat:"0" }}</p>
             <p><strong>Estado:</strong> {{ reservation.get_status_display }}</p>
             <p><strong>Fecha de reserva:</strong> {{ reservation.created_at|date:"d/m/Y H:i" }}</p>
         </div>

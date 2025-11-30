@@ -67,8 +67,13 @@
                     <div class="card cart-card h-100 shadow-sm" style="border-radius: 15px;">
                         <!-- Imagen del producto -->
                         <div style="height: 200px; overflow: hidden; border-radius: 15px 15px 0 0; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; padding: 10px;">
-                            <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}" 
-                                 style="max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.3s ease;" />
+                            {% if product.image %}
+                                <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}" 
+                                     style="max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.3s ease;" />
+                            {% else %}
+                                <img class="card-img-top" src="https://via.placeholder.com/200x150/f8f9fa/6c757d?text=Sin+Imagen" alt="{{ product.name }}" 
+                                     style="max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.3s ease;" />
+                            {% endif %}
                         </div>
                         
                         <!-- Contenido de la tarjeta -->

@@ -69,6 +69,37 @@ class Category(models.Model):
 	@property
 	def is_subcategory(self):
 		return self.parent is not None
+	
+	def get_slug(self):
+		"""Genera un slug único para esta categoría"""
+		from django.utils.text import slugify
+		return slugify(self.name)
+	
+	def get_url_slug(self):
+		"""Obtiene el slug para usar en URLs"""
+		return self.get_slug()
+	
+	def save(self, *args, **kwargs):
+		"""Override save para validaciones adicionales"""
+		# Validar que no haya duplicados
+		if self.parent:
+			# Para subcategorías, verificar duplicados dentro del mismo padre
+			existing = Category.objects.filter(
+				name__iexact=self.name, 
+				parent=self.parent
+			).exclude(id=self.id)
+			if existing.exists():
+				raise ValueError(f"Ya existe una subcategoría '{self.name}' en '{self.parent.name}'")
+		else:
+			# Para categorías principales, verificar duplicados globales
+			existing = Category.objects.filter(
+				name__iexact=self.name, 
+				parent=None
+			).exclude(id=self.id)
+			if existing.exists():
+				raise ValueError(f"Ya existe una categoría principal '{self.name}'")
+		
+		super().save(*args, **kwargs)
 
 	class Meta:
 		verbose_name = "Categoría"
@@ -119,13 +150,13 @@ class Customer(models.Model):
 # All of our Products
 class Product(models.Model):
 	name = models.CharField(max_length=100)
-	price = models.DecimalField(default=0, decimal_places=4, max_digits=10)
+	price = models.DecimalField(decimal_places=2, default=0, help_text='Precio en pesos argentinos (ARS)', max_digits=12)
 	category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
 	description = models.CharField(max_length=250, default='', blank=True, null=True)
-	image = models.ImageField(upload_to='uploads/product/')
+	image = models.ImageField(blank=True, null=True, upload_to='uploads/product/')
 	# Add Sale Stuff
 	is_sale = models.BooleanField(default=False)
-	sale_price = models.DecimalField(default=0, decimal_places=4, max_digits=10)
+	sale_price = models.DecimalField(decimal_places=2, default=0, help_text='Precio de oferta en pesos argentinos (ARS)', max_digits=12)
 	# Add Stock Management
 	stock = models.PositiveIntegerField(default=0, help_text="Cantidad disponible en inventario")
 	is_available = models.BooleanField(default=True, help_text="Disponible para compra")

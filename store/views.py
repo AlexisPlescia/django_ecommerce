@@ -23,6 +23,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Count
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
+import unicodedata
 
 def search(request):
     query = request.GET.get('q', '').strip()
@@ -112,17 +113,21 @@ def category(request, foo):
 	# Replace Hyphens with Spaces
 	foo = foo.replace('-', ' ')
 	
-	# Grab the category from the url
+	# Grab the category from the url usando búsqueda robusta
 	try:
-		# Look Up The Category
-		category = Category.objects.get(name__iexact=foo)
+		# Look Up The Category usando la nueva función
+		category = find_category_by_name(foo, parent=None)
+		if not category:
+			messages.error(request, f"La categoría '{foo}' no existe.")
+			return redirect('home')
+		
 		products = category.get_all_products()  # Usar el nuevo método
 		
 		# Obtener subcategorías si es una categoría principal
 		subcategories = category.subcategories.filter(is_active=True) if category.is_parent else None
 		
 		# Verificar si es la categoría "Armas" que requiere verificación de edad
-		category_name_lower = category.name.lower()
+		category_name_lower = normalize_text(category.name)
 		
 		if category_name_lower in ['armas', 'arma', 'firearms', 'weapons']:
 			return render(request, 'age_verification.html', {
@@ -136,27 +141,41 @@ def category(request, foo):
 			'category': category,
 			'subcategories': subcategories
 		})
-	except Category.DoesNotExist:
-		messages.success(request, ("That Category Doesn't Exist..."))
+	except Exception as e:
+		messages.error(request, f"La categoría '{foo}' no existe.")
 		return redirect('home')
 
 def subcategory(request, parent_slug, subcategory_slug):
-	"""Vista para subcategorías específicas"""
+	"""Vista para subcategorías específicas con búsqueda robusta"""
 	parent_name = parent_slug.replace('-', ' ')
 	subcategory_name = subcategory_slug.replace('-', ' ')
 	
 	try:
-		parent_category = Category.objects.get(name__iexact=parent_name, parent=None)
-		subcategory = Category.objects.get(name__iexact=subcategory_name, parent=parent_category)
+		# Usar la nueva función de búsqueda robusta
+		parent_category = find_category_by_name(parent_name, parent=None)
+		if not parent_category:
+			messages.error(request, f"La categoría '{parent_name}' no existe.")
+			return redirect('home')
+		
+		subcategory = find_category_by_name(subcategory_name, parent=parent_category)
+		if not subcategory:
+			messages.error(request, f"La subcategoría '{subcategory_name}' no existe en '{parent_category.name}'.")
+			return redirect('category', foo=parent_slug)
+		
 		products = Product.objects.filter(category=subcategory)
 		
-		return render(request, 'subcategory.html', {
+		# Agregar información adicional para el template
+		context = {
 			'products': products,
 			'subcategory': subcategory,
-			'parent_category': parent_category
-		})
-	except Category.DoesNotExist:
-		messages.error(request, "La subcategoría solicitada no existe.")
+			'parent_category': parent_category,
+			'product_count': products.count(),
+			'has_products': products.exists()
+		}
+		
+		return render(request, 'subcategory.html', context)
+	except Exception as e:
+		messages.error(request, f"Error al acceder a la subcategoría: {str(e)}")
 		return redirect('home')
 
 def categories_ajax(request):
@@ -481,3 +500,45 @@ def visit_stats(request):
     }
     
     return render(request, 'admin/visit_stats.html', context)
+
+def test_navbar(request):
+    """Vista temporal para debuggear el navbar"""
+    return render(request, 'test_navbar.html')
+
+
+def normalize_text(text):
+    """
+    Normaliza texto para búsquedas más robustas
+    Elimina acentos y caracteres especiales para comparación
+    """
+    # Normalizar unicode (NFD = Forma Normalizada Descompuesta)
+    normalized = unicodedata.normalize('NFD', text)
+    # Remover marcas diacríticas (acentos)
+    without_accents = ''.join(c for c in normalized if unicodedata.category(c) != 'Mn')
+    return without_accents.lower().strip()
+
+def find_category_by_name(name, parent=None):
+    """
+    Encuentra una categoría por nombre de forma más robusta
+    Maneja acentos y diferencias de capitalización
+    """
+    # Normalizar el nombre a buscar
+    normalized_search = normalize_text(name)
+    
+    # Obtener todas las categorías candidatas
+    if parent:
+        candidates = Category.objects.filter(parent=parent)
+    else:
+        candidates = Category.objects.filter(parent=None)
+    
+    # Buscar por coincidencia exacta primero
+    for category in candidates:
+        if normalize_text(category.name) == normalized_search:
+            return category
+    
+    # Si no encuentra coincidencia exacta, buscar por contención
+    for category in candidates:
+        if normalized_search in normalize_text(category.name) or normalize_text(category.name) in normalized_search:
+            return category
+    
+    return None

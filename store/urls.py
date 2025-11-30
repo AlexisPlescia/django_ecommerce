@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/visit-stats/', views.visit_stats, name='visit_stats'),
     path('search/', views.search, name='search'),
     path('webhook/mercadopago/', views.mercadopago_webhook, name='mercadopago_webhook'),
+    path('test-navbar/', views.test_navbar, name='test_navbar'),  # Vista temporal para debug
 ]

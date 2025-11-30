@@ -20,7 +20,7 @@
             {% endif %}
             
             <div class="product-count-badge">
-                {{ products.count }} producto{{ products.count|pluralize }}
+                {{ product_count }} producto{{ product_count|pluralize }}
             </div>
         </div>
     </div>
@@ -83,13 +83,27 @@
             {% endfor %}
         </div>
     {% else %}
-        <div class="no-products">
-            <h3><i class="fas fa-box-open"></i></h3>
-            <h3>No hay productos en esta subcategoría</h3>
-            <p>Actualmente no tenemos productos disponibles en "{{ subcategory.name }}".</p>
-            <a href="{% url 'category' parent_category.name|slugify %}" class="btn btn-primary mt-3">
-                <i class="fas fa-arrow-left"></i> Volver a {{ parent_category.name }}
-            </a>
+        <div class="no-products-section">
+            <div class="no-products-content">
+                <div class="no-products-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h2>No hay productos disponibles</h2>
+                <p class="no-products-message">
+                    Actualmente no tenemos productos disponibles en la subcategoría <strong>"{{ subcategory.name }}"</strong>.
+                </p>
+                <p class="no-products-suggestion">
+                    Te invitamos a explorar otros productos en la categoría principal.
+                </p>
+                <div class="no-products-actions">
+                    <a href="{% url 'category' parent_category.name|slugify %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Volver a {{ parent_category.name }}
+                    </a>
+                    <a href="{% url 'home' %}" class="btn btn-outline-secondary ml-3">
+                        <i class="fas fa-home"></i> Ir al inicio
+                    </a>
+                </div>
+            </div>
         </div>
     {% endif %}
 </div>

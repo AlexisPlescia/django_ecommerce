@@ -5,77 +5,82 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Productos</a></li>
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'search' %}">Buscar</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Como comprar</a></li>
-
-            {% if user.is_authenticated %}
-              
-   <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Perfil</a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="{% url 'update_user' %}">Perfil de usuario</a></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="{% url 'update_info'  %}">Informacion del usuario</a></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="{% url 'my_reservations' %}"><i class="fas fa-bookmark"></i> Mis Reservas</a></li>
-                            </ul>
-                        </li>
-            {% if user.is_superuser %}
-              <li class="nav-item dropdown">
-            
-            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administrar</a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="{% url 'shipped_dash' %}">Pedidos enviados</a></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="{% url 'not_shipped_dash'  %}">Pedidos no enviados</a></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="{% url 'admin_reservations' %}"><i class="fas fa-bookmark"></i> Administrar Reservas</a></li>
-                            </ul>
-                        </li>
-            {% endif %}
-
-
-               <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a></li>
-            {% else %}
-               <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a></li>
-
-               <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Registrarse</a></li>
-
-            {% endif %}
-
+                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
                         
-
-
-
+                        <!-- Dropdown de Categorías y Productos -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Productos</a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{% url 'category_summary' %}">Todos los productos</a></li>
+                            <a class="nav-link dropdown-toggle" id="navbarCategoriesDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Catálogo</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarCategoriesDropdown" style="min-width: 250px;">
+                                <!-- Opción para ver todos los productos -->
+                                <li><a class="dropdown-item fw-bold" href="{% url 'category_summary' %}">
+                                    <i class="fas fa-th me-2 text-primary"></i>Todos los productos
+                                </a></li>
                                 <li><hr class="dropdown-divider" /></li>
+                                
+                                <!-- Solo categorías principales -->
                                 {% for category in categories %}
-                                <li><a class="dropdown-item" href="{% url 'category' category.name %}">{{ category.name }}</a></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'category' category.name|slugify %}">
+                                            <i class="fas fa-folder me-2 text-muted"></i>
+                                            {{ category.name }}
+                                        </a>
+                                    </li>
                                 {% endfor %}
                             </ul>
                         </li>
-                        <li class="nav-item ms-3">
-    <form class="d-flex" method="get" action="/search/">
-        <input class="form-control me-2" type="search" name="q" placeholder="Buscar productos" aria-label="Buscar">
-        <button class="btn btn-outline-success" type="submit">Buscar</button>
-    </form>
-</li>
-                    </ul>
-                    <form class="d-flex">
-
-<a href="{% url 'cart_summary' %}" class="btn btn-outline-dark"><i class="bi-cart-fill me-1"></i>
-                            Carrito
-<span class="badge bg-dark text-white ms-1 rounded-pill" id="cart_quantity">{{ cart|length }}
-
-</span></a>
-
-
                         
-                    </form>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Como comprar</a></li>
+                        
+                        {% if user.is_authenticated %}
+                          
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Perfil</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'update_user' %}">Perfil de usuario</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" href="{% url 'update_info'  %}">Informacion del usuario</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" href="{% url 'my_reservations' %}"><i class="fas fa-bookmark"></i> Mis Reservas</a></li>
+                            </ul>
+                        </li>
+                        
+                        {% if user.is_superuser %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarAdminDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administrar</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarAdminDropdown">
+                                <li><a class="dropdown-item" href="{% url 'shipped_dash' %}">Pedidos enviados</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" href="{% url 'not_shipped_dash'  %}">Pedidos no enviados</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_reservations' %}"><i class="fas fa-bookmark"></i> Administrar Reservas</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+
+                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a></li>
+                        {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Registrarse</a></li>
+                        {% endif %}
+                    </ul>
+
+                    <!-- Barra de búsqueda y carrito fuera del ul principal -->
+                    <div class="d-flex align-items-center">
+                        <!-- Barra de búsqueda -->
+                        <form class="d-flex me-3" method="get" action="{% url 'search' %}">
+                            <input class="form-control me-2" type="search" name="q" placeholder="Buscar productos" aria-label="Buscar" style="width: 200px;">
+                            <button class="btn btn-outline-success" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                        
+                        <!-- Carrito -->
+                        <a href="{% url 'cart_summary' %}" class="btn btn-outline-dark">
+                            <i class="bi-cart-fill me-1"></i>
+                            Carrito
+                            <span class="badge bg-dark text-white ms-1 rounded-pill" id="cart_quantity">{{ cart|length }}</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </nav>

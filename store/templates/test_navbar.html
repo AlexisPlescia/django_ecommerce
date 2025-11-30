@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Test Navbar Django</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand" href="{% url 'home' %}">Armeria Sniper</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
+                    
+                    <!-- Dropdown de Categorías -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarCategoriesDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Categorías ({{ categories|length }})
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarCategoriesDropdown" style="min-width: 280px;">
+                            {% if categories %}
+                                {% for category in categories %}
+                                    <li><h6 class="dropdown-header text-uppercase fw-bold">{{ category.name }}</h6></li>
+                                    {% for subcategory in category.subcategories.all %}
+                                        {% if subcategory.is_active %}
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'subcategory' category.name|slugify subcategory.name|slugify %}">
+                                                    <i class="fas fa-chevron-right me-2 text-muted"></i>
+                                                    {{ subcategory.name }}
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if not forloop.last %}<li><hr class="dropdown-divider" /></li>{% endif %}
+                                {% endfor %}
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item fw-bold" href="{% url 'category_summary' %}">
+                                    <i class="fas fa-th-list me-2"></i>Ver todas las categorías
+                                </a></li>
+                            {% else %}
+                                <li><span class="dropdown-item-text">No hay categorías disponibles</span></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Como comprar</a></li>
+                </ul>
+                
+                <div class="d-flex">
+                    <a href="{% url 'cart_summary' %}" class="btn btn-outline-dark">
+                        <i class="bi-cart-fill me-1"></i>
+                        Carrito
+                        <span class="badge bg-dark text-white ms-1 rounded-pill" id="cart_quantity">{{ cart|length }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <h1>Debug Navbar Django</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Debug Information</h3>
+                <ul class="list-group">
+                    <li class="list-group-item">Total categorías: {{ categories|length }}</li>
+                    <li class="list-group-item">Usuario: {{ user.username|default:"Anónimo" }}</li>
+                    <li class="list-group-item">Cart items: {{ cart|length }}</li>
+                </ul>
+            </div>
+            
+            <div class="col-md-6">
+                <h3>Categorías Disponibles</h3>
+                {% for category in categories %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ category.name }}</h5>
+                            <p class="card-text">
+                                Subcategorías: {{ category.subcategories.all|length }}
+                                <br>Activa: {{ category.is_active }}
+                            </p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="alert alert-warning">No hay categorías disponibles</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        console.log('Categories count:', {{ categories|length }});
+        console.log('Bootstrap loaded:', typeof bootstrap !== 'undefined');
+        console.log('jQuery loaded:', typeof $ !== 'undefined' ? $.fn.jquery : 'No');
+    </script>
+</body>
+</html>

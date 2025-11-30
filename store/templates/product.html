@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load currency_filters %}
 {% block content %}
 
 <!-- Estilos personalizados para el carrusel de imágenes -->
@@ -224,12 +225,18 @@
                 <div class="carousel-container" id="carouselContainer">
                     <!-- Imagen principal -->
                     <div class="carousel-slide">
-                        <img src="{{ product.image.url }}" alt="{{ product.name }} - Imagen principal">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }} - Imagen principal">
+                        {% else %}
+                            <img src="https://via.placeholder.com/500x400/f8f9fa/6c757d?text=Sin+Imagen" alt="{{ product.name }} - Sin imagen">
+                        {% endif %}
                     </div>
                     <!-- Imágenes adicionales -->
                     {% for image in product.additional_images.all %}
                     <div class="carousel-slide">
-                        <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}">
+                        {% if image.image %}
+                            <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}">
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
@@ -299,14 +306,15 @@
                         {% if product.is_sale %}
                             <div>
                                 <span class="text-decoration-line-through opacity-75 me-3">
-                                    ${{ product.price|floatformat:"0" }}
+                                    {{ product.price|currency_no_decimals }}
                                 </span>
-                                <span class="fw-bold">
-                                    ${{ product.sale_price|floatformat:"0" }}
+                                <span class="fw-bold text-success">
+                                    {{ product.sale_price|currency_no_decimals }}
                                 </span>
+                                <span class="badge bg-danger ms-2">{{ product.get_discount_percentage }}% OFF</span>
                             </div>
                         {% else %}
-                            <span class="fw-bold">${{ product.price|floatformat:"0" }}</span>
+                            <span class="fw-bold">{{ product.price|currency_no_decimals }}</span>
                         {% endif %}
                     </div>
                     

@@ -22,7 +22,7 @@ def setup_shipping_methods():
             'name': 'oca',
             'base_cost': 2500.00,
             'cost_per_kg': 500.00,
-            'free_shipping_threshold': 50000.00,
+            'free_shipping_threshold': 200000.00,
             'estimated_days': '3-5 días hábiles',
             'is_active': True
         },
@@ -30,7 +30,7 @@ def setup_shipping_methods():
             'name': 'andreani',
             'base_cost': 3000.00,
             'cost_per_kg': 600.00,
-            'free_shipping_threshold': 60000.00,
+            'free_shipping_threshold': 200000.00,
             'estimated_days': '2-4 días hábiles',
             'is_active': True
         },
@@ -38,7 +38,7 @@ def setup_shipping_methods():
             'name': 'correo_argentino',
             'base_cost': 2000.00,
             'cost_per_kg': 400.00,
-            'free_shipping_threshold': 45000.00,
+            'free_shipping_threshold': 200000.00,
             'estimated_days': '4-7 días hábiles',
             'is_active': True
         },

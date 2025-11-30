@@ -5,10 +5,24 @@ from django.contrib.auth.models import User
 # Registro personalizado para Category con soporte de subcategorías
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'parent', 'is_active']
+    list_display = ['name', 'parent', 'subcategory_count', 'product_count', 'is_active']
     list_filter = ['is_active', 'parent']
-    search_fields = ['name']
+    search_fields = ['name', 'description']
     list_editable = ['is_active']
+    ordering = ['parent__name', 'name']
+    
+    def subcategory_count(self, obj):
+        """Muestra la cantidad de subcategorías"""
+        return obj.subcategories.count()
+    subcategory_count.short_description = 'Subcategorías'
+    
+    def product_count(self, obj):
+        """Muestra la cantidad de productos en esta categoría"""
+        return obj.get_all_products().count()
+    product_count.short_description = 'Productos'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('parent').prefetch_related('subcategories')
 
 admin.site.register(Customer)
 admin.site.register(Order)
